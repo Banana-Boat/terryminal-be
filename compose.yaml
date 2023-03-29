@@ -1,0 +1,63 @@
+version: "3"
+
+services:
+  redis:
+    image: redis:7-alpine
+    deploy:
+      mode: global
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./db-data/redis:/data
+
+  mysql:
+    image: mysql:8.0
+    deploy:
+      mode: global
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=12345
+      - MYSQL_DATABASE=test
+    volumes:
+      - ./db-data/mysql:/var/lib/mysql
+
+  mail-service:
+    image: tiangexiang/mail-service:0.1.0
+    deploy:
+      mode: replicated
+      replicas: 1
+    depends_on:
+      - redis
+    ports:
+      - "8081:8081"
+    environment:
+      # 重写 REDIS_HOST 变量
+      - REDIS_HOST=redis
+
+  main-service:
+    image: tiangexiang/main-service:0.1.0
+    deploy:
+      mode: replicated
+      replicas: 1
+    depends_on:
+      - mail-service
+      - mysql
+    ports:
+      - "8080:8080"
+    environment:
+      - GIN_MODE=release
+      # 重写 MIGRATION_FILE_URL 变量
+      - MIGRATION_FILE_URL=file://migration
+      # 重写 DB_HOST 变量，compose创建network，使两个容器之间可以通过容器名作为ip通信
+      - DB_HOST=mysql
+      # 重写 MAIL_SERVICE_HOST 变量
+      - MAIL_SERVICE_HOST=mail-service
+
+    # 同时使用CMD和ENTRYPOINT，会将cmd作为entrypoint的默认参数进行执行，
+    # 即 ENTRYPOINT [ "/app/wait-for.sh", "mysql:3306", "--", "/app/main" ]
+    # 容器具有指定可执行文件，同时需要能方便地修改默认参数，可选择此中方式
+
+    # 通过wait-for.sh脚本，使server在mysql成功运行后再开始运行，设置超时上限为50s
+    entrypoint: ["/app/wait-for.sh", "mysql:3306", "-t", "60", "--"]
+    command: ["/app/main"]
