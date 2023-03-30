@@ -1,4 +1,4 @@
-module github.com/Banana-Boat/go-micro-template/main-service
+module github.com/Banana-Boat/terryminal/terryminal-main
 
 go 1.19
 

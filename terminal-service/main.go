@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/Banana-Boat/go-micro-template/mail-service/internal/api"
-	"github.com/Banana-Boat/go-micro-template/mail-service/internal/pb"
-	"github.com/Banana-Boat/go-micro-template/mail-service/internal/util"
-	"github.com/Banana-Boat/go-micro-template/mail-service/internal/worker"
+	"github.com/Banana-Boat/terryminal/terryminal-terminal/internal/api"
+	"github.com/Banana-Boat/terryminal/terryminal-terminal/internal/pb"
+	"github.com/Banana-Boat/terryminal/terryminal-terminal/internal/util"
+	"github.com/Banana-Boat/terryminal/terryminal-terminal/internal/worker"
 	"github.com/hibiken/asynq"
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc"
@@ -44,13 +44,13 @@ func runGRPCServer(config util.Config, taskDistributor *worker.TaskDistributor) 
 	pb.RegisterMailServiceServer(grpcServer, server)
 	reflection.Register(grpcServer) // 使得grpc客户端能够了解哪些rpc调用被服务端支持，以及如何调用
 
-	listener, err := net.Listen("tcp", fmt.Sprintf("%s:%s", config.MailServerHost, config.MailServerPort))
+	listener, err := net.Listen("tcp", fmt.Sprintf("%s:%s", config.TerminalServerHost, config.TerminalServerPort))
 	if err != nil {
 		log.Fatal().Err(err).Msg("cannot create listener")
 		return err
 	}
 
-	log.Info().Msgf("gRPC server started at %s:%s successfully", config.MailServerHost, config.MailServerPort)
+	log.Info().Msgf("gRPC server started at %s:%s successfully", config.TerminalServerHost, config.TerminalServerPort)
 	err = grpcServer.Serve(listener)
 	if err != nil {
 		log.Fatal().Err(err).Msg("cannot start gRPC server")

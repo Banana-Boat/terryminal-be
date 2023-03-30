@@ -1,2 +1,5 @@
 *.log
 db-data/
+
+compose.yaml
+**/app.env

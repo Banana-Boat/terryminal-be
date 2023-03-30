@@ -12,7 +12,7 @@ import (
 
 	"github.com/rs/zerolog/log"
 
-	"github.com/Banana-Boat/go-micro-template/main-service/internal/util"
+	"github.com/Banana-Boat/terryminal/terryminal-main/internal/util"
 	_ "github.com/go-sql-driver/mysql"
 )
 

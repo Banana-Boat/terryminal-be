@@ -7,10 +7,10 @@ import (
 )
 
 type Config struct {
-	MainServerHost  string `mapstructure:"MAIN_SERVER_HOST"`
-	MainServerPort  string `mapstructure:"MAIN_SERVER_PORT"`
-	MailServiceHost string `mapstructure:"MAIL_SERVICE_HOST"`
-	MailServicePort string `mapstructure:"MAIL_SERVICE_PORT"`
+	MainServerHost      string `mapstructure:"MAIN_SERVER_HOST"`
+	MainServerPort      string `mapstructure:"MAIN_SERVER_PORT"`
+	TerminalServiceHost string `mapstructure:"TERMINAL_SERVICE_HOST"`
+	TerminalServicePort string `mapstructure:"TERMINAL_SERVICE_PORT"`
 
 	MigrationFileUrl string `mapstructure:"MIGRATION_FILE_URL"`
 	DBDriver         string `mapstructure:"DB_DRIVER"`
@@ -29,8 +29,8 @@ type Config struct {
 // MAIN_SERVER_PORT=8080
 
 // # 邮件服务地址
-// MAIL_SERVICE_HOST=localhost
-// MAIL_SERVICE_PORT=8081
+// TERMINAL_SERVICE_HOST=localhost
+// TERMINAL_SERVICE_PORT=8081
 
 func LoadConfig(path string) (config Config, err error) {
 	viper.AddConfigPath(path)

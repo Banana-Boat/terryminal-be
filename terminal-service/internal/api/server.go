@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/Banana-Boat/go-micro-template/mail-service/internal/pb"
-	"github.com/Banana-Boat/go-micro-template/mail-service/internal/util"
-	"github.com/Banana-Boat/go-micro-template/mail-service/internal/worker"
+	"github.com/Banana-Boat/terryminal/terryminal-terminal/internal/pb"
+	"github.com/Banana-Boat/terryminal/terryminal-terminal/internal/util"
+	"github.com/Banana-Boat/terryminal/terryminal-terminal/internal/worker"
 	"github.com/hibiken/asynq"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

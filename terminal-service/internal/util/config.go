@@ -5,8 +5,8 @@ import (
 )
 
 type Config struct {
-	MailServerHost string `mapstructure:"MAIL_SERVER_HOST"`
-	MailServerPort string `mapstructure:"MAIL_SERVER_PORT"`
+	TerminalServerHost string `mapstructure:"TERMINAL_SERVER_HOST"`
+	TerminalServerPort string `mapstructure:"TERMINAL_SERVER_PORT"`
 
 	RedisHost string `mapstructure:"REDIS_HOST"`
 	RedisPort string `mapstructure:"REDIS_PORT"`

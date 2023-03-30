@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/Banana-Boat/go-micro-template/main-service/internal/db"
-	"github.com/Banana-Boat/go-micro-template/main-service/internal/pb"
-	"github.com/Banana-Boat/go-micro-template/main-service/internal/util"
+	"github.com/Banana-Boat/terryminal/terryminal-main/internal/db"
+	"github.com/Banana-Boat/terryminal/terryminal-main/internal/pb"
+	"github.com/Banana-Boat/terryminal/terryminal-main/internal/util"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -158,7 +158,7 @@ func (server *Server) login(ctx *gin.Context) {
 
 	/* 通过gRPC调用mail-service发送登录邮件 */
 	err = sendMailViaGRPC(
-		fmt.Sprintf("%s:%s", server.config.MailServiceHost, server.config.MailServicePort),
+		fmt.Sprintf("%s:%s", server.config.TerminalServiceHost, server.config.TerminalServicePort),
 		user.Email,
 	)
 	if err != nil {

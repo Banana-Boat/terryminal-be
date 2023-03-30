@@ -6,9 +6,9 @@ import (
 
 	"github.com/rs/zerolog/log"
 
-	"github.com/Banana-Boat/go-micro-template/main-service/internal/api"
-	"github.com/Banana-Boat/go-micro-template/main-service/internal/db"
-	"github.com/Banana-Boat/go-micro-template/main-service/internal/util"
+	"github.com/Banana-Boat/terryminal/terryminal-main/internal/api"
+	"github.com/Banana-Boat/terryminal/terryminal-main/internal/db"
+	"github.com/Banana-Boat/terryminal/terryminal-main/internal/util"
 	_ "github.com/go-sql-driver/mysql"
 
 	"github.com/golang-migrate/migrate/v4"
