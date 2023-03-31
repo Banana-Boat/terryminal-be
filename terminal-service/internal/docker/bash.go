@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/api/types/container"
 	containerTypes "github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
 )
@@ -34,7 +33,7 @@ func NewBashContainer(name string) (*bashContainer, error) {
 	// io.Copy(os.Stdout, out) // 打印拉取进度（输出流）
 
 	// /* 创建docker container */
-	resp, err := cli.ContainerCreate(ctx, &container.Config{
+	resp, err := cli.ContainerCreate(ctx, &containerTypes.Config{
 		Image: imageName,
 	}, nil, nil, nil, name)
 	if err != nil {
