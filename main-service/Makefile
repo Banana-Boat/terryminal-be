@@ -18,7 +18,7 @@ proto:
 	./internal/proto/*.proto
 
 test:
-	go test -v -cover -short ./...
+	go clean -testcache && go test -v -cover -short ./...
 
 server:
 	go run main.go
