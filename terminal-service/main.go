@@ -36,7 +36,7 @@ func main() {
 func runGRPCServer(config util.Config, taskDistributor *worker.TaskDistributor) error {
 	server, err := api.NewServer(config, taskDistributor)
 	if err != nil {
-		log.Fatal().Err(err).Msg("cannot create server: ")
+		log.Fatal().Err(err).Msg("cannot create server")
 		return err
 	}
 

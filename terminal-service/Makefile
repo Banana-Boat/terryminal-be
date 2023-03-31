@@ -11,7 +11,7 @@ redis:
 	docker run --name terryminal-redis -p 6379:6379 -d redis:7-alpine
 
 test:
-	go test -v -cover -short ./...
+	go clean -testcache && go test -v -cover -short ./...
 
 server:
 	go run main.go
