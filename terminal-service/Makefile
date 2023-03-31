@@ -10,10 +10,15 @@ evans:
 redis:
 	docker run --name terryminal-redis -p 6379:6379 -d redis:7-alpine
 
-test:
+# github action执行的测试（通过-short flag区分）
+remote_test:
 	go clean -testcache && go test -v -cover -short ./...
+	
+# 本地执行的测试
+local_test:
+	go clean -testcache && go test -v -cover ./...
 
 server:
 	go run main.go
 
-.PHONY: proto evans redis test server
+.PHONY: proto evans redis remote_test local_test server

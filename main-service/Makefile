@@ -17,10 +17,16 @@ proto:
 	--go-grpc_out=./internal/pb --go-grpc_opt=paths=source_relative \
 	./internal/proto/*.proto
 
-test:
+# github action执行的测试（通过-short flag区分）
+remote_test:
 	go clean -testcache && go test -v -cover -short ./...
+	
+# 本地执行的测试
+local_test:
+	go clean -testcache && go test -v -cover ./...
 
 server:
 	go run main.go
 
-.PHONY: mysql migrate_init sqlc proto test server
+
+.PHONY: mysql migrate_init sqlc proto remote_test local_test server

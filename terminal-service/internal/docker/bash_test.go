@@ -9,6 +9,11 @@ import (
 )
 
 func TestCreateBash(t *testing.T) {
+	// github action 不执行该测试
+	if testing.Short() {
+		t.Skip("skipping test in short mode.")
+	}
+
 	bashContainer, err := NewBashContainer(fmt.Sprint(time.Now().Unix()))
 	if err != nil {
 		log.Fatal().Err(err)
