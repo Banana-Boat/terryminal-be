@@ -1,6 +1,6 @@
 # Terryminal
 
-Terry's Online Terminal
+The backend of Terry's online Terminal
 
 ## 界面演示
 
