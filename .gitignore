@@ -3,3 +3,5 @@ db-data/
 
 compose.yaml
 **/app.env
+
+**/node_modules
