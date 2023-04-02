@@ -11,10 +11,11 @@ migrate_init:
 sqlc:
 	sqlc generate
 
+# go-grpc_out对应protoc-gen-go-grpc插件；go_out对应protoc-gen-go插件
 proto:
-	rm -rf ./internal/pb/*.go
-	protoc --proto_path=./internal/proto --go_out=./internal/pb --go_opt=paths=source_relative \
-	--go-grpc_out=./internal/pb --go-grpc_opt=paths=source_relative \
+	rm -rf ./internal/pb/*
+	protoc --proto_path=./internal/proto --go_out=./internal/pb --go-grpc_out=./internal/pb \
+	--go_opt=paths=source_relative --go-grpc_opt=paths=source_relative \
 	./internal/proto/*.proto
 
 # github action执行的测试（通过-short flag区分）

@@ -5,6 +5,7 @@
   "main": "./build/server.js",
   "type": "module",
   "scripts": {
+    "proto": "rm -rf ./src/pb/* && protoc --proto_path=./src/proto --ts_out=./src/pb ./src/proto/*.proto",
     "build": "tsc",
     "start-dev": "rm -rf build && npm run build && node build/server.js",
     "start-prod": "node build/server.js"
@@ -13,11 +14,13 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/google-protobuf": "^3.15.6",
     "@types/node": "^18.15.11",
     "typescript": "^5.0.3"
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.8.13",
+    "google-protobuf": "^3.21.2",
     "node-pty": "^0.10.1"
   }
 }
