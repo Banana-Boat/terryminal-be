@@ -4,6 +4,7 @@ BASE_PTY_VERSION = 0.1.0
 
 build_images:
 	@echo "Building all the images..."
+	npm --prefix ./base-pty/ run build
 	docker build -f ./base-pty/Dockerfile -t ${DOCKER_USERNAME}/terryminal-base-pty:${BASE_PTY_VERSION} ./base-pty
 
 remove_images:

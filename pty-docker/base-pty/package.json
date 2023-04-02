@@ -1,0 +1,23 @@
+{
+  "name": "base-pty",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./build/server.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start-dev": "rm -rf build && npm run build && node build/server.js",
+    "start-prod": "node build/server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^18.15.11",
+    "typescript": "^5.0.3"
+  },
+  "dependencies": {
+    "@grpc/grpc-js": "^1.8.13",
+    "node-pty": "^0.10.1"
+  }
+}

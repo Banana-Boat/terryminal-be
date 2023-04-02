@@ -5,3 +5,4 @@ compose.yaml
 **/app.env
 
 **/node_modules
+**/build
