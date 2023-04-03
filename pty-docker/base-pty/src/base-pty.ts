@@ -1,22 +1,23 @@
+import { ServerDuplexStream } from "@grpc/grpc-js";
 import pty from "node-pty";
+import { RunCmdRequest, RunCmdResponse } from "./pb/base_pty.js";
 import { sleep } from "./util.js";
 
 export class BasePty {
   ptyProcess: pty.IPty;
 
-  constructor() {
+  constructor(call: ServerDuplexStream<RunCmdRequest, RunCmdResponse>) {
     this.ptyProcess = pty.spawn("bash", [], {
-      name: "xterm-color",
-      cols: 80,
+      cols: 300, // 影响传输次数，待查明！！
       rows: 30,
       cwd: "/",
     });
 
     this.ptyProcess.onData((data) => {
-      process.stdout.write("terryminal: " + data);
+      call.write(new RunCmdResponse({ result: data }));
     });
 
-    sleep(1000);
+    sleep(500);
   }
 
   close() {

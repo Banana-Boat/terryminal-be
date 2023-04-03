@@ -3,14 +3,6 @@ syntax = "proto3";
 // protoc的目标为GO语言，则需要指定go_package。其值为.go代码的完整导入路径
 // option go_package = "github.com/Banana-Boat/terryminal/terminal-service/internal/pb";
 
-message StartRequest {
-  string username = 1;
-}
-
-message StartResponse {
-  string result = 1;
-}
-
 message RunCmdRequest {
   string cmd = 1;
 }
@@ -19,7 +11,11 @@ message RunCmdResponse {
   string result = 1;
 }
 
+/* 
+  Server: BasePty
+  Client: Terminal Service
+*/
 service BasePty {
-  rpc Start (StartRequest) returns (StartResponse) {}
-  rpc RunCmd (RunCmdRequest) returns (RunCmdResponse) {}
+  // 在BasePty中执行命令，返回结果
+  rpc RunCmd (stream RunCmdRequest) returns (stream RunCmdResponse) {}
 }
