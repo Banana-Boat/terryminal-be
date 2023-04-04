@@ -1,14 +1,6 @@
 DOCKER_USERNAME = tiangexiang
 BASE_PTY_VERSION = 0.1.0
 
-# evans:
-# 	docker run --rm --network terryminal -v "$(PWD):/mount:ro" \
-# 		ghcr.io/ktr0731/evans:0.10.7 \
-# 		--path ./base-pty/src/proto \
-# 		--proto base_pty.proto \
-# 		--host 172.22.0.2 \
-# 		--port 8081 \
-# 		repl
 
 evans:
 		evans --proto ./base-pty/src/proto/base_pty.proto --host localhost --port 8081 repl
