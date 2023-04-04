@@ -1,18 +1,24 @@
 import { BasePtyService } from "./server.js";
 import grpc from "@grpc/grpc-js";
 import { UnimplementedBasePtyService } from "./pb/base_pty.js";
+import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
 
-const HOST = "0.0.0.0";
-const PORT = "8081";
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+dotenv.config({
+  path: path.join(__dirname, "..", `.env`),
+});
 
 (() => {
+  const { SERVICE_HOST, SERVICE_PORT } = process.env;
   const basePtyService = new BasePtyService();
   const server = new grpc.Server();
 
   server.addService(UnimplementedBasePtyService.definition, basePtyService);
 
   server.bindAsync(
-    `${HOST}:${PORT}`,
+    `${SERVICE_HOST}:${SERVICE_PORT}`,
     grpc.ServerCredentials.createInsecure(),
     (err, port) => {
       if (err) {
@@ -20,7 +26,7 @@ const PORT = "8081";
         return;
       }
       server.start();
-      console.log(`Server running on port: ${port}`);
+      console.log(`Server running at: ${SERVICE_HOST}:${port}`);
     }
   );
 })();

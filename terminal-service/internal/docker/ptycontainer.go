@@ -7,7 +7,9 @@ import (
 
 	"github.com/docker/docker/api/types"
 	containerTypes "github.com/docker/docker/api/types/container"
+	networkTypes "github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
+	"github.com/docker/go-connections/nat"
 )
 
 type PtyContainer struct {
@@ -16,7 +18,7 @@ type PtyContainer struct {
 	ImageName     string
 }
 
-func NewPtyContainer(imageName string, containerName string) (*PtyContainer, error) {
+func NewPtyContainer(imageName string, containerName string, network string, isNeedPortMap bool) (*PtyContainer, error) {
 	ctx := context.Background()
 
 	/* 创建docker client */
@@ -47,10 +49,28 @@ func NewPtyContainer(imageName string, containerName string) (*PtyContainer, err
 		io.Copy(os.Stdout, out) // 必须输出否则报错，待查明！！
 	}
 
-	// /* 创建docker container */
-	resp, err := cli.ContainerCreate(ctx, &containerTypes.Config{
-		Image: imageName,
-	}, nil, nil, nil, containerName)
+	/* 创建docker container */
+	var hostConfig *containerTypes.HostConfig = nil
+	// 本地测试需要做端口映射
+	if isNeedPortMap {
+		hostConfig = &containerTypes.HostConfig{
+			PortBindings: nat.PortMap{
+				"8081/tcp": []nat.PortBinding{{
+					HostPort: "8081",
+				}},
+			},
+		}
+	}
+	resp, err := cli.ContainerCreate(ctx,
+		&containerTypes.Config{
+			Image: imageName,
+		},
+		hostConfig,
+		&networkTypes.NetworkingConfig{
+			EndpointsConfig: map[string]*networkTypes.EndpointSettings{
+				network: {},
+			},
+		}, nil, containerName)
 	if err != nil {
 		return nil, err
 	}
@@ -102,7 +122,7 @@ func (ptyContainer *PtyContainer) Remove() error {
 	}
 	defer cli.Close()
 
-	/* 停止容器 */
+	/* 删除容器 */
 	if err := cli.ContainerRemove(context.Background(), ptyContainer.ID, types.ContainerRemoveOptions{}); err != nil {
 		return err
 	}

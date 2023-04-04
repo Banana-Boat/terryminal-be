@@ -14,6 +14,7 @@ export class BasePty {
     });
 
     this.ptyProcess.onData((data) => {
+      console.log(`result: ${data}`);
       call.write(new RunCmdResponse({ result: data }));
     });
 

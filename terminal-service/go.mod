@@ -1,4 +1,4 @@
-module github.com/Banana-Boat/terryminal/terryminal-terminal
+module github.com/Banana-Boat/terryminal/terminal-service
 
 go 1.19
 

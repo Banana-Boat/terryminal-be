@@ -2,7 +2,7 @@
 db-data/
 
 compose.yaml
-**/app.env
+**/*.env
 
 **/node_modules
 **/build

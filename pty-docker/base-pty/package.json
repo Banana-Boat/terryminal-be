@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.8.13",
+    "dotenv": "^16.0.3",
     "google-protobuf": "^3.21.2",
     "node-pty": "^0.10.1"
   }

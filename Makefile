@@ -2,6 +2,8 @@ DOCKER_USERNAME = tiangexiang
 MAIN_VERSION = 0.1.0
 TERMINAL_VERSION = 0.1.0
 
+create_network:
+	docker network create terryminal
 
 build_images:
 	@echo "Building all the images..."
@@ -19,4 +21,4 @@ build_push_multi:
 	docker buildx build -t ${DOCKER_USERNAME}/terryminal-main:${MAIN_VERSION} --platform=linux/arm,linux/arm64,linux/amd64 --push ./main-service
 	docker buildx build -t ${DOCKER_USERNAME}/terryminal-terminal:${TERMINAL_VERSION} --platform=linux/arm,linux/arm64,linux/amd64 --push ./terminal-service
 
-.PHONY: build_images remove_images build_push_multi
+.PHONY: create_network build_images remove_images build_push_multi
