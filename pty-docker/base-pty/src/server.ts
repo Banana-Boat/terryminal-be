@@ -13,11 +13,7 @@ export class BasePtyService extends UnimplementedBasePtyService {
       const { cmd } = chunk;
       console.log(`cmd: ${cmd}`);
 
-      if (cmd) {
-        // 后续需要补充退出的命令 Ctr+D / Ctrl+C
-        if (cmd === "exit") call.end();
-        else basePty.runCmd(cmd);
-      }
+      if (cmd) basePty.runCmd(cmd);
     });
   }
 }

@@ -15,14 +15,17 @@ _待补全..._
 - [**golang-migrate**](https://github.com/golang-migrate/migrate)（数据库迁移）
 - [**Paseto**](https://github.com/o1egl/paseto)（用户鉴权）
 
+## 端口说明
+
+为便于本地调试，将不同容器中服务端口全部区分，作以下规定：
+
+- main-service 容器中，端口范围 3200-3209
+- terminal-service 容器中，端口范围 3210-3219
+- pty 相关容器，端口范围 3220-3229
+
 ## 接口文档
 
 _待补全..._
-
-## 编译运行
-
-- 安装 Go 依赖 `go mod tidy`
-- 执行`make server`，编译运行
 
 ## 服务端部署
 

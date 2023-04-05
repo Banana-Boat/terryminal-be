@@ -5,8 +5,11 @@ import (
 )
 
 type Config struct {
-	TerminalServerHost string `mapstructure:"TERMINAL_SERVER_HOST"`
-	TerminalServerPort string `mapstructure:"TERMINAL_SERVER_PORT"`
+	TerminalGRPCServerHost string `mapstructure:"TERMINAL_GRPC_SERVER_HOST"`
+	TerminalGRPCServerPort string `mapstructure:"TERMINAL_GRPC_SERVER_PORT"`
+
+	TerminalWSServerHost string `mapstructure:"TERMINAL_WS_SERVER_HOST"`
+	TerminalWSServerPort string `mapstructure:"TERMINAL_WS_SERVER_PORT"`
 
 	BasePtyHost      string `mapstructure:"BASE_PTY_HOST"`
 	BasePtyPort      string `mapstructure:"BASE_PTY_PORT"`

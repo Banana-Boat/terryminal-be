@@ -8,5 +8,5 @@ COPY .env .
 # make / python3 / build-base是node-pty所需的依赖项
 RUN npm install --omit=dev
 
-EXPOSE 8081
+EXPOSE 3220
 CMD [ "npm", "run", "start-prod" ]

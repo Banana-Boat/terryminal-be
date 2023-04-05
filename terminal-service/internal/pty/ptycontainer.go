@@ -1,7 +1,8 @@
-package docker
+package pty
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"os"
 
@@ -18,7 +19,12 @@ type PtyContainer struct {
 	ImageName     string
 }
 
-func NewPtyContainer(imageName string, containerName string, network string, isNeedPortMap bool) (*PtyContainer, error) {
+type PtyPortMap struct {
+	HostPort      string
+	ContainerPort string
+}
+
+func NewPtyContainer(imageName string, containerName string, network string, ptyPortMap *PtyPortMap) (*PtyContainer, error) {
 	ctx := context.Background()
 
 	/* 创建docker client */
@@ -52,11 +58,11 @@ func NewPtyContainer(imageName string, containerName string, network string, isN
 	/* 创建docker container */
 	var hostConfig *containerTypes.HostConfig = nil
 	// 本地测试需要做端口映射
-	if isNeedPortMap {
+	if ptyPortMap != nil {
 		hostConfig = &containerTypes.HostConfig{
 			PortBindings: nat.PortMap{
-				"8081/tcp": []nat.PortBinding{{
-					HostPort: "8081",
+				nat.Port(fmt.Sprintf("%s/tcp", ptyPortMap.ContainerPort)): []nat.PortBinding{{
+					HostPort: ptyPortMap.HostPort,
 				}},
 			},
 		}

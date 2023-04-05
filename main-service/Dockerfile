@@ -15,6 +15,6 @@ COPY ./wait-for.sh .
 # <src> 是一个目录，则将目录下的所有文件写入<dest>中
 COPY ./internal/db/migration ./migration
 
-EXPOSE 8080
+EXPOSE 3200
 
 CMD [ "/app/main" ]

@@ -3,7 +3,7 @@ BASE_PTY_VERSION = 0.1.0
 
 
 evans:
-		evans --proto ./base-pty/src/proto/base_pty.proto --host localhost --port 8081 repl
+		evans --proto ./base-pty/src/proto/base_pty.proto --host localhost --port 3220 repl
 
 build_images:
 	@echo "Building all the images..."

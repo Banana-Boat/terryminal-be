@@ -1,4 +1,4 @@
-package docker
+package pty
 
 import (
 	"context"
@@ -28,7 +28,13 @@ func TestCreateBash(t *testing.T) {
 
 	/* 容器创建并启动 */
 	containerName := fmt.Sprint(time.Now().Unix())
-	bashContainer, err := NewPtyContainer(config.BasePtyImageName, containerName, config.BasePtyNetwork, true)
+	bashContainer, err := NewPtyContainer(
+		config.BasePtyImageName, containerName, config.BasePtyNetwork,
+		&PtyPortMap{
+			HostPort:      config.BasePtyPort,
+			ContainerPort: config.BasePtyPort,
+		},
+	)
 	if err != nil {
 		t.Error(err)
 	}
@@ -45,7 +51,6 @@ func TestCreateBash(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	defer conn.Close()
 	c := pb.NewBasePtyClient(conn)
 	stream, err := c.RunCmd(context.Background())
 	if err != nil {
@@ -54,6 +59,7 @@ func TestCreateBash(t *testing.T) {
 
 	done := make(chan bool)
 	go func() {
+		defer conn.Close()
 		for {
 			resp, err := stream.Recv()
 			if err == io.EOF {
