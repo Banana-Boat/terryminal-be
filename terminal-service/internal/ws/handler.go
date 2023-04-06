@@ -26,12 +26,12 @@ func launchHandle(s socketio.Conn, containerName string, config util.Config) {
 		},
 	)
 	if err != nil {
-		log.Fatal().Err(err).Msg("failed to create pty container")
+		log.Error().Err(err).Msg("failed to create pty container")
 		s.Emit("launch", false)
 		return
 	}
 	if err = basePtyContainer.Start(); err != nil {
-		log.Fatal().Err(err).Msg("failed to start pty container")
+		log.Error().Err(err).Msg("failed to start pty container")
 		s.Emit("launch", false)
 		return
 	}
@@ -43,7 +43,7 @@ func launchHandle(s socketio.Conn, containerName string, config util.Config) {
 		grpc.WithBlock(),
 	)
 	if err != nil {
-		log.Fatal().Err(err).Msg("failed to create gRPC client")
+		log.Error().Err(err).Msg("failed to create gRPC client")
 		s.Emit("launch", false)
 		return
 	}
@@ -52,7 +52,7 @@ func launchHandle(s socketio.Conn, containerName string, config util.Config) {
 	/* 调用RunCmd方法获取数据流对象，创建go routine接受数据流的数据，转发到client */
 	ptyStream, err := basePtyClient.RunCmd(context.Background())
 	if err != nil {
-		log.Fatal().Err(err).Msg("failed to create gRPC client")
+		log.Error().Err(err).Msg("failed to create gRPC client")
 		s.Emit("launch", false)
 		return
 	}
@@ -89,13 +89,13 @@ func runCmdHandle(s socketio.Conn, cmd string) {
 	/* 如果传入为exit，则关闭gRPC连接 & 关闭并删除容器 */
 	if cmd == "exit" { // 后续需要补充退出的命令 Ctr+D / Ctrl+C
 		if err := wsContext.gRPCConnection.Close(); err != nil {
-			log.Fatal().Err(err).Msg("failed to close gRPC Connection")
+			log.Error().Err(err).Msg("failed to close gRPC Connection")
 		}
 		if err := wsContext.basePtyContainer.Stop(); err != nil {
-			log.Fatal().Err(err).Msg("failed to stop basePty container")
+			log.Error().Err(err).Msg("failed to stop basePty container")
 		}
 		if err := wsContext.basePtyContainer.Remove(); err != nil {
-			log.Fatal().Err(err).Msg("failed to remove basePty container")
+			log.Error().Err(err).Msg("failed to remove basePty container")
 		}
 		log.Info().Msg("successed to remove pty container and close gRPC client")
 		return

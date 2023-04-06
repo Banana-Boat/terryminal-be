@@ -47,7 +47,7 @@ func (wsServer *WSServer) setupRouter() {
 	})
 
 	wsServer.server.OnError("/", func(s socketio.Conn, err error) {
-		log.Fatal().Err(err).Msg("websocket error")
+		log.Error().Err(err).Msg("websocket error")
 	})
 
 	wsServer.server.OnEvent("/", "launch", func(s socketio.Conn, containerName string) {

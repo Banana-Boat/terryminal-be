@@ -1,16 +1,22 @@
 package main
 
 import (
+	"os"
+
 	"github.com/Banana-Boat/terryminal/terminal-service/internal/util"
 	"github.com/Banana-Boat/terryminal/terminal-service/internal/ws"
+	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
 
 func main() {
+	// 美化zerolog
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+
 	/* 加载配置 */
 	config, err := util.LoadConfig(".")
 	if err != nil {
-		log.Fatal().Err(err).Msg("cannot load config")
+		log.Error().Err(err).Msg("cannot load config")
 		return
 	}
 
@@ -26,6 +32,6 @@ func runWSServer(config util.Config) {
 		config.TerminalWSServerHost, config.TerminalWSServerPort,
 	)
 	if err := wsServer.Start(); err != nil {
-		log.Fatal().Err(err).Msg("cannot start websocket server")
+		log.Error().Err(err).Msg("cannot start websocket server")
 	}
 }
