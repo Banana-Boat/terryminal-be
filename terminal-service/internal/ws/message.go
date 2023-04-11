@@ -10,11 +10,13 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+// websocket message定义
 type Message struct {
 	Event string                 `json:"event" mapstructure:"event"`
 	Data  map[string]interface{} `json:"data" mapstructure:"data"`
 }
 
+/* Message中Data具体定义 */
 type LaunchClientData struct {
 	ContainerName string `json:"containerName" mapstructure:"containerName"`
 }

@@ -21,6 +21,7 @@ type WSServer struct {
 	server *gin.Engine
 }
 
+// 单个socket连接的上下文
 type WSContext struct {
 	conn             net.Conn
 	config           util.Config
@@ -31,7 +32,6 @@ type WSContext struct {
 }
 
 func NewWSServer(config util.Config) *WSServer {
-	gin.SetMode(gin.ReleaseMode)
 	server := gin.Default()
 
 	server.GET("/", func(c *gin.Context) {
@@ -40,6 +40,7 @@ func NewWSServer(config util.Config) *WSServer {
 			log.Error().Err(err).Msg("cannot upgrade http to websocket")
 			return
 		}
+		defer conn.Close()
 
 		wsCtx := &WSContext{
 			conn:   conn,
@@ -50,7 +51,16 @@ func NewWSServer(config util.Config) *WSServer {
 			if err != nil {
 				break
 			}
-			route(wsCtx, msg)
+
+			/* 解析 message */
+			var wsMsg Message
+			if err := json.Unmarshal(msg, &wsMsg); err != nil {
+				log.Error().Err(err).Msg("cannot unmarshal message")
+				break
+			}
+
+			/* 根据Event字段进行路由 */
+			routeByEvent(wsCtx, wsMsg)
 		}
 	})
 
@@ -62,38 +72,39 @@ func NewWSServer(config util.Config) *WSServer {
 	return wsServer
 }
 
-func route(wsCtx *WSContext, msg []byte) {
-	var wsMsg Message
-	if err := json.Unmarshal(msg, &wsMsg); err != nil {
-		log.Error().Err(err).Msg("cannot unmarshal message")
-		return
-	}
-
+func routeByEvent(wsCtx *WSContext, wsMsg Message) {
 	switch wsMsg.Event {
 	case "launch":
+		/* 将Data字段解析为对应结构体 */
 		var data LaunchClientData
 		if err := mapstructure.Decode(wsMsg.Data, &data); err != nil {
 			log.Error().Err(err).Msg("cannot decode data")
 			return
 		}
+
 		launchHandle(wsCtx, data.ContainerName, wsCtx.config)
 
 	case "close":
 		closeHandle(wsCtx)
 
 	case "run-cmd":
+		/* 将Data字段解析为对应结构体 */
 		var data RunCmdClientData
 		if err := mapstructure.Decode(wsMsg.Data, &data); err != nil {
 			log.Error().Err(err).Msg("cannot decode data")
 			return
 		}
+
 		runCmdHandle(wsCtx, data.Cmd)
 	}
 }
 
 func (wsServer *WSServer) Start() error {
-	wsServer.server.Run(
+	if err := wsServer.server.Run(
 		fmt.Sprintf("%s:%s", wsServer.config.TerminalWSServerHost, wsServer.config.TerminalWSServerPort),
-	)
+	); err != nil {
+		return err
+	}
+
 	return nil
 }

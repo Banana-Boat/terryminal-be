@@ -27,10 +27,6 @@ func main() {
 func runWSServer(config util.Config) {
 	wsServer := ws.NewWSServer(config)
 
-	log.Info().Msgf(
-		"websocket server started at %s:%s successfully",
-		config.TerminalWSServerHost, config.TerminalWSServerPort,
-	)
 	if err := wsServer.Start(); err != nil {
 		log.Error().Err(err).Msg("cannot start websocket server")
 	}
