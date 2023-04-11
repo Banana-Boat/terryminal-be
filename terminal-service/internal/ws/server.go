@@ -1,23 +1,29 @@
 package ws
 
 import (
+	"encoding/json"
 	"fmt"
-	"net/http"
+	"net"
 
 	"github.com/Banana-Boat/terryminal/terminal-service/internal/pb"
 	"github.com/Banana-Boat/terryminal/terminal-service/internal/pty"
 	"github.com/Banana-Boat/terryminal/terminal-service/internal/util"
-	socketio "github.com/googollee/go-socket.io"
+	"github.com/gin-gonic/gin"
+	"github.com/gobwas/ws"
+	"github.com/gobwas/ws/wsutil"
+	"github.com/mitchellh/mapstructure"
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc"
 )
 
 type WSServer struct {
 	config util.Config
-	server *socketio.Server
+	server *gin.Engine
 }
 
-type wsContext struct {
+type WSContext struct {
+	conn             net.Conn
+	config           util.Config
 	basePtyContainer *pty.PtyContainer
 	gRPCConnection   *grpc.ClientConn
 	basePtyClient    pb.BasePtyClient
@@ -25,53 +31,69 @@ type wsContext struct {
 }
 
 func NewWSServer(config util.Config) *WSServer {
+	gin.SetMode(gin.ReleaseMode)
+	server := gin.Default()
+
+	server.GET("/", func(c *gin.Context) {
+		conn, _, _, err := ws.UpgradeHTTP(c.Request, c.Writer)
+		if err != nil {
+			log.Error().Err(err).Msg("cannot upgrade http to websocket")
+			return
+		}
+
+		wsCtx := &WSContext{
+			conn:   conn,
+			config: config,
+		}
+		for {
+			msg, _, err := wsutil.ReadClientData(conn)
+			if err != nil {
+				break
+			}
+			route(wsCtx, msg)
+		}
+	})
+
 	wsServer := &WSServer{
 		config: config,
-		server: socketio.NewServer(nil),
+		server: server,
 	}
-
-	wsServer.setupRouter()
 
 	return wsServer
 }
 
-func (wsServer *WSServer) setupRouter() {
+func route(wsCtx *WSContext, msg []byte) {
+	var wsMsg Message
+	if err := json.Unmarshal(msg, &wsMsg); err != nil {
+		log.Error().Err(err).Msg("cannot unmarshal message")
+		return
+	}
 
-	wsServer.server.OnConnect("/", func(s socketio.Conn) error {
-		log.Info().Msgf("connected: %s", s.ID())
-		return nil
-	})
+	switch wsMsg.Event {
+	case "launch":
+		var data LaunchClientData
+		if err := mapstructure.Decode(wsMsg.Data, &data); err != nil {
+			log.Error().Err(err).Msg("cannot decode data")
+			return
+		}
+		launchHandle(wsCtx, data.ContainerName, wsCtx.config)
 
-	wsServer.server.OnDisconnect("/", func(s socketio.Conn, reason string) {
-		log.Info().Msgf("disconnect: %s, reason: %s", s.ID(), reason)
-	})
+	case "close":
+		closeHandle(wsCtx)
 
-	wsServer.server.OnError("/", func(s socketio.Conn, err error) {
-		log.Error().Err(err).Msg("websocket error")
-	})
-
-	wsServer.server.OnEvent("/", "launch", func(s socketio.Conn, containerName string) {
-		launchHandle(s, containerName, wsServer.config)
-	})
-
-	wsServer.server.OnEvent("/", "close", closeHandle)
-
-	wsServer.server.OnEvent("/", "run-cmd", runCmdHandle)
+	case "run-cmd":
+		var data RunCmdClientData
+		if err := mapstructure.Decode(wsMsg.Data, &data); err != nil {
+			log.Error().Err(err).Msg("cannot decode data")
+			return
+		}
+		runCmdHandle(wsCtx, data.Cmd)
+	}
 }
 
 func (wsServer *WSServer) Start() error {
-	go wsServer.server.Serve()
-	defer wsServer.server.Close()
-
-	// 框架默认地址前缀，无需改动
-	http.Handle("/socket.io/", wsServer.server)
-
-	if err := http.ListenAndServe(
+	wsServer.server.Run(
 		fmt.Sprintf("%s:%s", wsServer.config.TerminalWSServerHost, wsServer.config.TerminalWSServerPort),
-		nil,
-	); err != nil {
-		return err
-	}
-
+	)
 	return nil
 }

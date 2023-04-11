@@ -8,13 +8,12 @@ import (
 	"github.com/Banana-Boat/terryminal/terminal-service/internal/pb"
 	"github.com/Banana-Boat/terryminal/terminal-service/internal/pty"
 	"github.com/Banana-Boat/terryminal/terminal-service/internal/util"
-	socketio "github.com/googollee/go-socket.io"
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-func launchHandle(s socketio.Conn, containerName string, config util.Config) {
+func launchHandle(wsCtx *WSContext, containerName string, config util.Config) {
 	/* 创建容器并启动 */
 
 	// 端口映射待去除！！！！
@@ -27,12 +26,12 @@ func launchHandle(s socketio.Conn, containerName string, config util.Config) {
 	)
 	if err != nil {
 		log.Error().Err(err).Msg("failed to create pty container")
-		s.Emit("launch", false)
+		sendMessage(wsCtx.conn, "launch", LaunchServerData{Result: false})
 		return
 	}
 	if err = basePtyContainer.Start(); err != nil {
 		log.Error().Err(err).Msg("failed to start pty container")
-		s.Emit("launch", false)
+		sendMessage(wsCtx.conn, "launch", LaunchServerData{Result: false})
 		return
 	}
 
@@ -44,7 +43,7 @@ func launchHandle(s socketio.Conn, containerName string, config util.Config) {
 	)
 	if err != nil {
 		log.Error().Err(err).Msg("failed to create gRPC client")
-		s.Emit("launch", false)
+		sendMessage(wsCtx.conn, "launch", LaunchServerData{Result: false})
 		return
 	}
 	basePtyClient := pb.NewBasePtyClient(gRPCConnection)
@@ -53,7 +52,7 @@ func launchHandle(s socketio.Conn, containerName string, config util.Config) {
 	ptyStream, err := basePtyClient.RunCmd(context.Background())
 	if err != nil {
 		log.Error().Err(err).Msg("failed to create gRPC client")
-		s.Emit("launch", false)
+		sendMessage(wsCtx.conn, "launch", LaunchServerData{Result: false})
 		return
 	}
 	go func() {
@@ -65,36 +64,33 @@ func launchHandle(s socketio.Conn, containerName string, config util.Config) {
 			if err != nil {
 				return
 			}
-			s.Emit("run-cmd", true, resp.Result)
+
+			sendMessage(wsCtx.conn, "run-cmd", RunCmdServerData{Result: resp.Result})
 			log.Info().Msgf("run-cmd receive: %s", resp.Result)
 		}
 	}()
 
-	/* 将存入context */
-	s.SetContext(&wsContext{
-		basePtyContainer: basePtyContainer,
-		gRPCConnection:   gRPCConnection,
-		basePtyClient:    basePtyClient,
-		ptyStream:        ptyStream,
-	})
+	/* 将对象存入context */
+	wsCtx.basePtyClient = basePtyClient
+	wsCtx.basePtyContainer = basePtyContainer
+	wsCtx.gRPCConnection = gRPCConnection
+	wsCtx.ptyStream = ptyStream
 
 	/* 向客户端发送成功的消息 */
 	log.Info().Msg("successed to start pty container and create gRPC client")
-	s.Emit("launch", true)
+	sendMessage(wsCtx.conn, "launch", LaunchServerData{Result: true})
 }
 
-func runCmdHandle(s socketio.Conn, cmd string) {
-	wsContext := s.Context().(*wsContext)
-
+func runCmdHandle(wsCtx *WSContext, cmd string) {
 	/* 如果传入为exit，则关闭gRPC连接 & 关闭并删除容器 */
 	if cmd == "exit" { // 后续需要补充退出的命令 Ctr+D / Ctrl+C
-		if err := wsContext.gRPCConnection.Close(); err != nil {
+		if err := wsCtx.gRPCConnection.Close(); err != nil {
 			log.Error().Err(err).Msg("failed to close gRPC Connection")
 		}
-		if err := wsContext.basePtyContainer.Stop(); err != nil {
+		if err := wsCtx.basePtyContainer.Stop(); err != nil {
 			log.Error().Err(err).Msg("failed to stop basePty container")
 		}
-		if err := wsContext.basePtyContainer.Remove(); err != nil {
+		if err := wsCtx.basePtyContainer.Remove(); err != nil {
 			log.Error().Err(err).Msg("failed to remove basePty container")
 		}
 		log.Info().Msg("successed to remove pty container and close gRPC client")
@@ -102,13 +98,13 @@ func runCmdHandle(s socketio.Conn, cmd string) {
 	}
 
 	log.Info().Msgf("run-cmd send: %s", cmd)
-	wsContext.ptyStream.Send(&pb.RunCmdRequest{
+	wsCtx.ptyStream.Send(&pb.RunCmdRequest{
 		Cmd: cmd,
 	})
 }
 
-func closeHandle(s socketio.Conn) {
-	s.Emit("close", true)
+func closeHandle(wsCtx *WSContext) {
+	sendMessage(wsCtx.conn, "close", CloseServerData{Result: true})
 
-	s.Close()
+	wsCtx.conn.Close()
 }
