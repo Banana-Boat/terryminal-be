@@ -17,22 +17,31 @@ type Message struct {
 }
 
 /* Message中Data具体定义 */
-type LaunchClientData struct {
-	ContainerName string `json:"containerName" mapstructure:"containerName"`
+type StartClientData struct {
+	PtyID string `json:"ptyID" mapstructure:"ptyID"`
 }
-type LaunchServerData struct {
-	Result bool `json:"result" mapstructure:"result"`
+type StartServerData struct {
+	PtyID  string `json:"ptyID" mapstructure:"ptyID"`
+	Result bool   `json:"result" mapstructure:"result"`
 }
 
-type CloseServerData struct {
-	Result bool `json:"result" mapstructure:"result"`
+type EndClientData struct {
+	PtyID string `json:"ptyID" mapstructure:"ptyID"`
+}
+
+type EndServerData struct {
+	PtyID  string `json:"ptyID" mapstructure:"ptyID"`
+	Result bool   `json:"result" mapstructure:"result"`
 }
 
 type RunCmdClientData struct {
-	Cmd string `json:"cmd" mapstructure:"cmd"`
+	PtyID string `json:"ptyID" mapstructure:"ptyID"`
+	Cmd   string `json:"cmd" mapstructure:"cmd"`
 }
 type RunCmdServerData struct {
-	Result string `json:"result" mapstructure:"result"`
+	PtyID   string `json:"ptyID" mapstructure:"ptyID"`
+	IsError bool   `json:"isError" mapstructure:"isError"`
+	Result  string `json:"result" mapstructure:"result"`
 }
 
 func sendMessage(conn net.Conn, event string, data interface{}) {

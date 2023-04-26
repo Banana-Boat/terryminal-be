@@ -21,14 +21,18 @@ type WSServer struct {
 	server *gin.Engine
 }
 
+type PtyHandler struct {
+	container  *pty.PtyContainer       // pty Docker容器
+	gRPCConn   *grpc.ClientConn        // gRPC连接
+	gRPCClient pb.BasePtyClient        // gRPC客户端
+	gRPCStream pb.BasePty_RunCmdClient // gRPC数据流
+}
+
 // 单个socket连接的上下文
 type WSContext struct {
-	conn             net.Conn
-	config           util.Config
-	basePtyContainer *pty.PtyContainer
-	gRPCConnection   *grpc.ClientConn
-	basePtyClient    pb.BasePtyClient
-	ptyStream        pb.BasePty_RunCmdClient
+	conn          net.Conn
+	config        util.Config
+	PtyHandlerMap map[string]*PtyHandler
 }
 
 func NewWSServer(config util.Config) *WSServer {
@@ -40,23 +44,29 @@ func NewWSServer(config util.Config) *WSServer {
 			log.Error().Err(err).Msg("cannot upgrade http to websocket")
 			return
 		}
+		log.Info().Msgf("new socket conn from %s", conn.RemoteAddr().String())
 		defer conn.Close()
 
 		wsCtx := &WSContext{
-			conn:   conn,
-			config: config,
+			conn:          conn,
+			config:        config,
+			PtyHandlerMap: make(map[string]*PtyHandler),
 		}
 		for {
 			msg, _, err := wsutil.ReadClientData(conn)
 			if err != nil {
-				break
+				if len(wsCtx.PtyHandlerMap) != 0 { // 客户端主动断开连接
+					destroy(wsCtx)
+				}
+				log.Info().Msgf("socket conn closed from %s", conn.RemoteAddr().String())
+				return
 			}
 
 			/* 解析 message */
 			var wsMsg Message
 			if err := json.Unmarshal(msg, &wsMsg); err != nil {
 				log.Error().Err(err).Msg("cannot unmarshal message")
-				break
+				return
 			}
 
 			/* 根据Event字段进行路由 */
@@ -74,18 +84,24 @@ func NewWSServer(config util.Config) *WSServer {
 
 func routeByEvent(wsCtx *WSContext, wsMsg Message) {
 	switch wsMsg.Event {
-	case "launch":
+	case "start":
 		/* 将Data字段解析为对应结构体 */
-		var data LaunchClientData
+		var data StartClientData
 		if err := mapstructure.Decode(wsMsg.Data, &data); err != nil {
 			log.Error().Err(err).Msg("cannot decode data")
 			return
 		}
 
-		launchHandle(wsCtx, data.ContainerName, wsCtx.config)
+		startHandle(wsCtx, data.PtyID, wsCtx.config)
 
-	case "close":
-		closeHandle(wsCtx)
+	case "end":
+		/* 将Data字段解析为对应结构体 */
+		var data EndClientData
+		if err := mapstructure.Decode(wsMsg.Data, &data); err != nil {
+			log.Error().Err(err).Msg("cannot decode data")
+			return
+		}
+		endHandle(wsCtx, data.PtyID)
 
 	case "run-cmd":
 		/* 将Data字段解析为对应结构体 */
@@ -95,7 +111,7 @@ func routeByEvent(wsCtx *WSContext, wsMsg Message) {
 			return
 		}
 
-		runCmdHandle(wsCtx, data.Cmd)
+		runCmdHandle(wsCtx, data.PtyID, data.Cmd)
 	}
 }
 

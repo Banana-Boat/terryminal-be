@@ -29,7 +29,7 @@ func TestCreateBash(t *testing.T) {
 	/* 容器创建并启动 */
 	containerName := fmt.Sprint(time.Now().Unix())
 	bashContainer, err := NewPtyContainer(
-		config.BasePtyImageName, containerName, config.BasePtyNetwork,
+		config.BasePtyImageName, containerName, "",
 		&PtyPortMap{
 			HostPort:      config.BasePtyPort,
 			ContainerPort: config.BasePtyPort,

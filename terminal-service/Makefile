@@ -3,6 +3,7 @@ default: help
 help:
 	@fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/##//'
 
+# =================================================gRPC相关=======================================================
 .PHONY: proto
 # go-grpc_out对应protoc-gen-go-grpc插件；go_out对应protoc-gen-go插件
 proto: ## 根据proto文件生成go代码
@@ -12,13 +13,10 @@ proto: ## 根据proto文件生成go代码
 	./internal/proto/*.proto
 
 .PHONY: evans
-evans: ##	测试gRPC服务
+evans: ## 测试gRPC服务
 	evans --host localhost --port 8081 -r repl
-
-.PHONY: redis
-redis: ## 启动redis
-	docker run --name terryminal-redis -p 6379:6379 -d redis:7-alpine
-
+	
+# =================================================测试相关=======================================================
 .PHONY: remote_test
 remote_test: ## github action执行的测试（通过-short flag区分）
 	go clean -testcache && go test -v -cover -short ./...
@@ -27,6 +25,26 @@ remote_test: ## github action执行的测试（通过-short flag区分）
 local_test: ## 本地执行的测试
 	go clean -testcache && go test -v -cover ./...
 
-.PHONY: server
-server: ## 启动服务
+# =================================================服务运行（直接）=======================================================
+.PHONY: redis
+redis: ## 启动redis
+	docker run --name terryminal-redis -p 6379:6379 -d redis:7-alpine
+
+.PHONY: run
+run: ## 启动服务
 	go run main.go
+
+# =================================================服务运行（docker）=======================================================
+.PHONY: build_image
+build_image: ## 构建镜像
+	docker build -t terryminal-terminal:dev .
+
+.PHONY: run_docker
+run_docker: ## 启动服务（docker）
+	docker run -v /var/run/docker.sock:/var/run/docker.sock --name terryminal-terminal --network terryminal -p 3211:3211 terryminal-terminal:dev
+
+.PHONY: clean_docker
+clean_docker: ## 停止容器并删除容器与镜像
+	docker stop terryminal-terminal
+	docker rm terryminal-terminal
+	docker rmi terryminal-terminal:dev
