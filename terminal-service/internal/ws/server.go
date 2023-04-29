@@ -85,23 +85,10 @@ func NewWSServer(config util.Config) *WSServer {
 func routeByEvent(wsCtx *WSContext, wsMsg Message) {
 	switch wsMsg.Event {
 	case "start":
-		/* 将Data字段解析为对应结构体 */
-		var data StartClientData
-		if err := mapstructure.Decode(wsMsg.Data, &data); err != nil {
-			log.Error().Err(err).Msg("cannot decode data")
-			return
-		}
-
-		startHandle(wsCtx, data.PtyID, wsCtx.config)
+		startHandle(wsCtx, wsMsg.PtyID, wsCtx.config)
 
 	case "end":
-		/* 将Data字段解析为对应结构体 */
-		var data EndClientData
-		if err := mapstructure.Decode(wsMsg.Data, &data); err != nil {
-			log.Error().Err(err).Msg("cannot decode data")
-			return
-		}
-		endHandle(wsCtx, data.PtyID)
+		endHandle(wsCtx, wsMsg.PtyID)
 
 	case "run-cmd":
 		/* 将Data字段解析为对应结构体 */
@@ -111,7 +98,7 @@ func routeByEvent(wsCtx *WSContext, wsMsg Message) {
 			return
 		}
 
-		runCmdHandle(wsCtx, data.PtyID, data.Cmd)
+		runCmdHandle(wsCtx, wsMsg.PtyID, data.Cmd)
 	}
 }
 
