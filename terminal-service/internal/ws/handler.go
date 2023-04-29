@@ -92,24 +92,41 @@ func runCmdHandle(wsCtx *WSContext, ptyID string, cmd string) {
 }
 
 func endHandle(wsCtx *WSContext, ptyID string) {
+	if err := destroy(wsCtx, ptyID); err != nil {
+		log.Error().Err(err).Msgf("PtyID: %s, failed to remove pty container and close gRPC client", ptyID)
+	}
+	log.Info().Msgf("PtyID: %s, remove pty container and close gRPC client successfully", ptyID)
 	sendMessage(wsCtx.conn, ptyID, "end", EndServerData{Result: true})
-	destroy(wsCtx)
 }
 
 // 遍历所有的ptyHandler，关闭gRPC连接，停止容器，删除容器
-func destroy(wsCtx *WSContext) {
-	for ptyID, ptyHandler := range wsCtx.PtyHandlerMap {
-		if err := ptyHandler.gRPCConn.Close(); err != nil {
-			log.Error().Err(err).Msgf("PtyID: %s, failed to close gRPC Connection", ptyID)
-		}
-		if err := ptyHandler.container.Stop(); err != nil {
-			log.Error().Err(err).Msgf("PtyID: %s, failed to stop basePty container", ptyID)
-		}
-		if err := ptyHandler.container.Remove(); err != nil {
-			log.Error().Err(err).Msgf("PtyID: %s, failed to remove basePty container", ptyID)
-		}
-		log.Info().Msgf("PtyID: %s, remove pty container and close gRPC client successfully", ptyID)
+func destroy(wsCtx *WSContext, ptyID string) error {
+	if wsCtx.PtyHandlerMap[ptyID] == nil {
+		return fmt.Errorf("ptyID: %s not found", ptyID)
+	}
 
-		delete(wsCtx.PtyHandlerMap, ptyID)
+	ptyHandler := wsCtx.PtyHandlerMap[ptyID]
+	if err := ptyHandler.gRPCConn.Close(); err != nil {
+		return err
+	}
+	if err := ptyHandler.container.Stop(); err != nil {
+		return err
+	}
+	if err := ptyHandler.container.Remove(); err != nil {
+		return err
+	}
+
+	delete(wsCtx.PtyHandlerMap, ptyID)
+	return nil
+}
+
+func destroyAll(wsCtx *WSContext) {
+	for ptyID, _ := range wsCtx.PtyHandlerMap {
+		if err := destroy(wsCtx, ptyID); err != nil {
+			log.Error().Err(err).Msgf("PtyID: %s, failed to remove pty container and close gRPC client", ptyID)
+			continue
+		}
+
+		log.Info().Msgf("PtyID: %s, remove pty container and close gRPC client successfully", ptyID)
 	}
 }

@@ -56,7 +56,7 @@ func NewWSServer(config util.Config) *WSServer {
 			msg, _, err := wsutil.ReadClientData(conn)
 			if err != nil {
 				if len(wsCtx.PtyHandlerMap) != 0 { // 客户端主动断开连接
-					destroy(wsCtx)
+					destroyAll(wsCtx)
 				}
 				log.Info().Msgf("socket conn closed from %s", conn.RemoteAddr().String())
 				return
