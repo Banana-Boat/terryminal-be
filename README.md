@@ -15,13 +15,14 @@ _待补全..._
 - [**golang-migrate**](https://github.com/golang-migrate/migrate)（数据库迁移）
 - [**Paseto**](https://github.com/o1egl/paseto)（用户鉴权）
 
-## 端口说明
+## 端口划分
 
-为便于本地调试，将不同容器中服务端口全部区分，作以下规定：
+为便于本地调试，划分不同服务所使用的端口，作以下规定：
 
-- main-service 容器中，端口范围 3200-3209
-- terminal-service 容器中，端口范围 3210-3219
-- pty 相关容器，端口范围 3220-3229
+- main-service 端口范围：3200-3209
+- terminal-service 端口范围：3210-3219
+- pty-docker 端口范围：3220-3229
+- bot-service 端口范围：3230-3239
 
 ## 接口文档
 
