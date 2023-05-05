@@ -26,10 +26,6 @@ local_test: ## 本地执行的测试
 	go clean -testcache && go test -v -cover ./...
 
 # =================================================服务运行（直接）=======================================================
-.PHONY: redis
-redis: ## 启动redis
-	docker run --name terryminal-redis -p 6379:6379 -d redis:7-alpine
-
 .PHONY: run
 run: ## 启动服务
 	go run main.go
