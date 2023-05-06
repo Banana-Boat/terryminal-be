@@ -23,7 +23,7 @@ func main() {
 		Addr: fmt.Sprintf("%s:%s", config.RedisHost, config.RedisPort),
 	}
 	taskDistributor := worker.NewTaskDistributor(redisOPt)
-	go runTaskProcessor(redisOPt)
+	// go runTaskProcessor(redisOPt)
 
 	/* 运行 http 服务 */
 	runHttpServer(config, taskDistributor)
