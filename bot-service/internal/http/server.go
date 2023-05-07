@@ -28,7 +28,7 @@ func NewServer(config util.Config, taskDistributor *worker.TaskDistributor) *Ser
 func (server *Server) setupRouter() {
 	router := gin.Default()
 
-	router.GET("/", server.conversation)
+	router.POST("/chat", server.chat)
 
 	server.router = router
 }

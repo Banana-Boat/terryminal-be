@@ -21,21 +21,15 @@ func TestApi2d(t *testing.T) {
 		t.Error(err)
 	}
 
-	reqBody := openai.ChatCompletionRequest{
-		Model: openai.GPT3Dot5Turbo,
-		Messages: []openai.ChatCompletionMessage{
-			{
-				Role:    openai.ChatMessageRoleUser,
-				Content: "你好",
-			},
+	messages := []openai.ChatCompletionMessage{
+		{
+			Role:    openai.ChatMessageRoleUser,
+			Content: "你好",
 		},
-		MaxTokens:   300,
-		Temperature: 0.2,
-		Stream:      true,
 	}
 
 	api2dClient := NewApi2dClient(config)
-	stream, err := api2dClient.CreateStream(reqBody)
+	stream, err := api2dClient.CreateStream(messages)
 	if err != nil {
 		t.Errorf("CreateStream() error = %v", err)
 		return

@@ -29,9 +29,16 @@ func NewApi2dClient(config util.Config) *Api2dClient {
 	}
 }
 
-func (api2dClient *Api2dClient) CreateStream(body openai.ChatCompletionRequest) (*Stream, error) {
-	/* 根据传入请求体创建请求 */
+func (api2dClient *Api2dClient) CreateStream(messages []openai.ChatCompletionMessage) (*Stream, error) {
+	/* 根据传入消息创建请求 */
 	client := &http.Client{}
+	body := openai.ChatCompletionRequest{
+		Model:       openai.GPT3Dot5Turbo,
+		Messages:    messages,
+		MaxTokens:   300,
+		Temperature: 0.2,
+		Stream:      true,
+	}
 	jsonBody, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
