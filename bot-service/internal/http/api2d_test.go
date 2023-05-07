@@ -10,6 +10,11 @@ import (
 )
 
 func TestApi2d(t *testing.T) {
+	// github action 不执行该测试
+	if testing.Short() {
+		t.Skip("Skipping test in github action.")
+	}
+
 	/* 加载配置 */
 	config, err := util.LoadConfig("../..")
 	if err != nil {
