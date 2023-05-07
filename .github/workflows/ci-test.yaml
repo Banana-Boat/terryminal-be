@@ -24,3 +24,6 @@ jobs:
 
       - name: Test terminal-service
         run: make -C ./terminal-service remote_test
+
+      - name: Test bot-service
+        run: make -C ./bot-service remote_test
