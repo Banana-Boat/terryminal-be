@@ -12,7 +12,14 @@ type chatRequest struct {
 	Messages []openai.ChatCompletionMessage `json:"messages" binding:"required"`
 }
 
+const maxMsgNum = 5 // 历史消息条数上限
+// 系统用户prompt
+const systemPrompt = `你是Terryminal平台的机器人，你叫Terry，你的职责是为用户解答有关Linux命令方面的疑问。
+当用户首次向你问好时，请简短地介绍你自己。`
+
 func (server *Server) chat(ctx *gin.Context) {
+	msgBuf := "" // 消息缓冲区
+
 	/* 解析请求参数 */
 	var req chatRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -20,6 +27,20 @@ func (server *Server) chat(ctx *gin.Context) {
 		return
 	}
 	messages := req.Messages
+	// 限制历史消息条数，以减少token开销
+	if len(messages) >= maxMsgNum {
+		messages = messages[len(messages)-maxMsgNum:]
+	}
+	// 添加系统角色的prompt到消息列表开头
+	_messages := []openai.ChatCompletionMessage{{
+		Role:    openai.ChatMessageRoleSystem,
+		Content: systemPrompt,
+	}}
+	messages = append(
+		_messages,
+		messages...,
+	)
+	log.Info().Msgf("Chat request: %+v", messages)
 
 	/* 设置响应头 */
 	ctx.Writer.Header().Set("Content-Type", "text/event-stream")
@@ -42,8 +63,24 @@ func (server *Server) chat(ctx *gin.Context) {
 		if err != nil {
 			/* 流数据读取完毕 */
 			if err == io.EOF {
-				log.Info().Msg("Stream read finished")
-				ctx.SSEvent("end", "") // 向客户端发送结束信息
+				/* 计算token开销 */
+				log.Info().Msg("Stream read finished, message: " + msgBuf)
+				_messages := append(
+					messages,
+					openai.ChatCompletionMessage{
+						Content: msgBuf,
+						Role:    openai.ChatMessageRoleAssistant,
+					},
+				)
+				tokens, err := CalTokenCost(_messages, openai.GPT3Dot5Turbo)
+				if err != nil {
+					log.Err(err).Msg("CalTokenCost failed")
+				} else {
+					log.Info().Msgf("Token cost: %d", tokens)
+				}
+
+				/* 向客户端发送结束信息 */
+				ctx.SSEvent("end", "")
 				return false
 			}
 			/* 流数据读取错误 */
@@ -57,6 +94,7 @@ func (server *Server) chat(ctx *gin.Context) {
 		}
 
 		/* 向客户端发送流数据 */
+		msgBuf += resp.Choices[0].Delta.Content
 		ctx.SSEvent(
 			"message",
 			gin.H{

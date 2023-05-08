@@ -35,7 +35,7 @@ func (api2dClient *Api2dClient) CreateStream(messages []openai.ChatCompletionMes
 	body := openai.ChatCompletionRequest{
 		Model:       openai.GPT3Dot5Turbo,
 		Messages:    messages,
-		MaxTokens:   300,
+		MaxTokens:   600,
 		Temperature: 0.2,
 		Stream:      true,
 	}

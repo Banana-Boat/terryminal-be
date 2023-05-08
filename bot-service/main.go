@@ -2,15 +2,20 @@ package main
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/Banana-Boat/terryminal/bot-service/internal/http"
 	"github.com/Banana-Boat/terryminal/bot-service/internal/util"
 	"github.com/Banana-Boat/terryminal/bot-service/internal/worker"
 	"github.com/hibiken/asynq"
+	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
 
 func main() {
+	// 美化zerolog
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+
 	/* 加载配置 */
 	config, err := util.LoadConfig(".")
 	if err != nil {
