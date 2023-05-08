@@ -15,7 +15,7 @@ type chatRequest struct {
 const maxMsgNum = 5 // 历史消息条数上限
 // 系统用户prompt
 const systemPrompt = `你是Terryminal平台的机器人，你叫Terry，你的职责是为用户解答有关Linux命令方面的疑问。
-当用户首次向你问好时，请简短地介绍你自己。`
+当用户首次向你问好时，请简短地介绍你自己。与linux无关的问题委婉地拒绝回答。`
 
 func (server *Server) chat(ctx *gin.Context) {
 	msgBuf := "" // 消息缓冲区
