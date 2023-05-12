@@ -60,7 +60,6 @@ func startHandle(wsCtx *WSContext, ptyID string, config util.Config) {
 			}
 
 			sendMessage(wsCtx.conn, ptyID, "run-cmd", RunCmdServerData{IsError: false, Result: resp.Result})
-			log.Info().Msgf("run-cmd receive: %s", resp.Result)
 		}
 	}()
 
@@ -121,7 +120,7 @@ func destroy(wsCtx *WSContext, ptyID string) error {
 }
 
 func destroyAll(wsCtx *WSContext) {
-	for ptyID, _ := range wsCtx.PtyHandlerMap {
+	for ptyID := range wsCtx.PtyHandlerMap {
 		if err := destroy(wsCtx, ptyID); err != nil {
 			log.Error().Err(err).Msgf("PtyID: %s, failed to remove pty container and close gRPC client", ptyID)
 			continue

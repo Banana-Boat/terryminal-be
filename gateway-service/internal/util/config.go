@@ -11,6 +11,8 @@ type Config struct {
 	GatewayServerPort   string `mapstructure:"GATEWAY_SERVER_PORT"`
 	TerminalServiceHost string `mapstructure:"TERMINAL_SERVICE_HOST"`
 	TerminalServicePort string `mapstructure:"TERMINAL_SERVICE_PORT"`
+	ChatbotServiceHost  string `mapstructure:"CHATBOT_SERVICE_HOST"`
+	ChatbotServicePort  string `mapstructure:"CHATBOT_SERVICE_PORT"`
 
 	MigrationFileUrl string `mapstructure:"MIGRATION_FILE_URL"`
 	DBDriver         string `mapstructure:"DB_DRIVER"`

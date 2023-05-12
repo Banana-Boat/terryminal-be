@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/Banana-Boat/terryminal/chatbot-service/internal/http"
+	"github.com/Banana-Boat/terryminal/chatbot-service/internal/grpc"
 	"github.com/Banana-Boat/terryminal/chatbot-service/internal/util"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -20,14 +20,14 @@ func main() {
 		return
 	}
 
-	/* 运行 http 服务 */
-	runHttpServer(config)
+	/* 运行 gRPC 服务 */
+	runGRPCServer(config)
 }
 
-func runHttpServer(config util.Config) {
-	server := http.NewServer(config)
+func runGRPCServer(config util.Config) {
+	server := grpc.NewServer(config)
 
 	if err := server.Start(); err != nil {
-		log.Error().Err(err).Msg("failed to start server")
+		log.Error().Err(err).Msg("failed to start gRPC server")
 	}
 }

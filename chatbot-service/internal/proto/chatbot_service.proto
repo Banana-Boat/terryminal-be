@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "github.com/Banana-Boat/terryminal/gateway-service/internal/pb";
+
+/* Chat */
+message ChatRequest {
+  message ChatMessage {
+    string role = 1;
+    string content = 2;
+  }
+  repeated ChatMessage messages = 1;
+}
+
+message ChatResponse {
+  string event = 1;
+  string data = 2;
+}
+
+/* Service */
+service Chatbot {
+  rpc Chat (ChatRequest) returns (stream ChatResponse) {}
+}

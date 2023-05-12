@@ -12,28 +12,19 @@ import (
 
 const createUser = `-- name: CreateUser :execresult
 INSERT INTO users (
-  username, password,email, gender, age
+  username, password
 ) VALUES (
-  ?, ?, ?, ?, ?
+  ?, ?
 )
 `
 
 type CreateUserParams struct {
-	Username string      `json:"username"`
-	Password string      `json:"password"`
-	Email    string      `json:"email"`
-	Gender   UsersGender `json:"gender"`
-	Age      int32       `json:"age"`
+	Username string `json:"username"`
+	Password string `json:"password"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (sql.Result, error) {
-	return q.db.ExecContext(ctx, createUser,
-		arg.Username,
-		arg.Password,
-		arg.Email,
-		arg.Gender,
-		arg.Age,
-	)
+	return q.db.ExecContext(ctx, createUser, arg.Username, arg.Password)
 }
 
 const deleteUser = `-- name: DeleteUser :exec
@@ -47,7 +38,7 @@ func (q *Queries) DeleteUser(ctx context.Context, id int32) error {
 }
 
 const getUserById = `-- name: GetUserById :one
-SELECT id, username, password, email, gender, age, created_at, updated_at FROM users
+SELECT id, username, password, created_at, updated_at FROM users
 WHERE id = ? LIMIT 1
 `
 
@@ -58,9 +49,6 @@ func (q *Queries) GetUserById(ctx context.Context, id int32) (User, error) {
 		&i.ID,
 		&i.Username,
 		&i.Password,
-		&i.Email,
-		&i.Gender,
-		&i.Age,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -68,7 +56,7 @@ func (q *Queries) GetUserById(ctx context.Context, id int32) (User, error) {
 }
 
 const getUserByUsername = `-- name: GetUserByUsername :one
-SELECT id, username, password, email, gender, age, created_at, updated_at FROM users
+SELECT id, username, password, created_at, updated_at FROM users
 WHERE username = ? LIMIT 1
 `
 
@@ -79,9 +67,6 @@ func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User,
 		&i.ID,
 		&i.Username,
 		&i.Password,
-		&i.Email,
-		&i.Gender,
-		&i.Age,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -103,7 +88,7 @@ func (q *Queries) IsExistUser(ctx context.Context, username string) (bool, error
 }
 
 const listUsers = `-- name: ListUsers :many
-SELECT id, username, password, email, gender, age, created_at, updated_at FROM users
+SELECT id, username, password, created_at, updated_at FROM users
 ORDER BY id
 LIMIT ? OFFSET ?
 `
@@ -126,9 +111,6 @@ func (q *Queries) ListUsers(ctx context.Context, arg ListUsersParams) ([]User, e
 			&i.ID,
 			&i.Username,
 			&i.Password,
-			&i.Email,
-			&i.Gender,
-			&i.Age,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -146,25 +128,16 @@ func (q *Queries) ListUsers(ctx context.Context, arg ListUsersParams) ([]User, e
 }
 
 const updateUser = `-- name: UpdateUser :exec
-UPDATE users SET password = ?, email = ?, gender = ?, age = ?
+UPDATE users SET password = ?
 WHERE id = ?
 `
 
 type UpdateUserParams struct {
-	Password string      `json:"password"`
-	Email    string      `json:"email"`
-	Gender   UsersGender `json:"gender"`
-	Age      int32       `json:"age"`
-	ID       int32       `json:"id"`
+	Password string `json:"password"`
+	ID       int32  `json:"id"`
 }
 
 func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) error {
-	_, err := q.db.ExecContext(ctx, updateUser,
-		arg.Password,
-		arg.Email,
-		arg.Gender,
-		arg.Age,
-		arg.ID,
-	)
+	_, err := q.db.ExecContext(ctx, updateUser, arg.Password, arg.ID)
 	return err
 }

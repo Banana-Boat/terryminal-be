@@ -51,6 +51,9 @@ func (server *Server) setupRouter() {
 	authRouter := router.Group("/").Use(authMiddleware(server.tokenMaker))
 	authRouter.GET("/user/listUsers", server.listUsers)
 
+	// authRouter.POST("/chatbot/chat", server.chat)
+	router.POST("/chatbot/chat", server.chat)
+
 	server.router = router
 }
 

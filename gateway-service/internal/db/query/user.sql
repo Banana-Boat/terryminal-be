@@ -1,8 +1,8 @@
 -- name: CreateUser :execresult
 INSERT INTO users (
-  username, password,email, gender, age
+  username, password
 ) VALUES (
-  ?, ?, ?, ?, ?
+  ?, ?
 );
 
 -- name: IsExistUser :one
@@ -25,7 +25,7 @@ ORDER BY id
 LIMIT ? OFFSET ?;
 
 -- name: UpdateUser :exec
-UPDATE users SET password = ?, email = ?, gender = ?, age = ?
+UPDATE users SET password = ?
 WHERE id = ?;
 
 -- name: DeleteUser :exec
