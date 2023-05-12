@@ -1,4 +1,4 @@
-package api
+package http
 
 import (
 	"fmt"
@@ -18,7 +18,7 @@ type Server struct {
 func NewServer(config util.Config, store *db.Store) (*Server, error) {
 	tokenMaker, err := util.NewTokenMaker(config.TokenSymmetricKey)
 	if err != nil {
-		return nil, fmt.Errorf("cannot create token maker: %w", err)
+		return nil, err
 	}
 
 	server := &Server{
@@ -32,8 +32,14 @@ func NewServer(config util.Config, store *db.Store) (*Server, error) {
 	return server, nil
 }
 
-func (server *Server) Start(address string) error {
-	return server.router.Run(address)
+func (server *Server) Start() error {
+	if err := server.router.Run(
+		fmt.Sprintf("%s:%s", server.config.MainServerHost, server.config.MainServerPort),
+	); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (server *Server) setupRouter() {

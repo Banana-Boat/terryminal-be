@@ -1,4 +1,4 @@
-package api
+package http
 
 import (
 	"context"
@@ -95,7 +95,6 @@ type listUserRequest struct {
 }
 
 func (server *Server) listUsers(ctx *gin.Context) {
-
 	var req listUserRequest
 	if err := ctx.ShouldBindQuery(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, wrapResponse(false, err.Error(), nil))

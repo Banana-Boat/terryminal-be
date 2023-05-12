@@ -8,8 +8,8 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 
-	"github.com/Banana-Boat/terryminal/main-service/internal/api"
 	"github.com/Banana-Boat/terryminal/main-service/internal/db"
+	"github.com/Banana-Boat/terryminal/main-service/internal/http"
 	"github.com/Banana-Boat/terryminal/main-service/internal/util"
 	_ "github.com/go-sql-driver/mysql"
 
@@ -19,7 +19,7 @@ import (
 )
 
 func main() {
-	// 美化zerolog
+	// 美化 zerolog
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 
 	/* 加载配置 */
@@ -28,37 +28,24 @@ func main() {
 		log.Error().Err(err).Msg("cannot load config")
 		return
 	}
-	log.Info().Msg("configuration loaded successfully")
 
 	/* 运行 DB migration */
 	if err = runDBMigrate(config); err != nil {
+		log.Error().Err(err).Msg("failed to migrate db")
 		return
 	}
+	log.Info().Msg("db migrated successfully")
 
-	/* 连接数据库 */
-	conn, err := sql.Open(
-		config.DBDriver,
-		fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true", config.DBUsername, config.DBPassword, config.DBHost, config.DBPort, config.DBName),
-	)
+	/* 获取数据库连接 */
+	store, err := getDBStore(config)
 	if err != nil {
-		log.Error().Err(err).Msg("cannot connect to db")
+		log.Error().Err(err).Msg("failed to connect to db")
 		return
 	}
-	store := db.NewStore(conn)
 	log.Info().Msg("db connected successfully")
 
-	/* 运行 gin 服务 */
-	server, err := api.NewServer(config, store)
-	if err != nil {
-		log.Error().Err(err).Msg("cannot create server")
-		return
-	}
-
-	log.Info().Msgf("gin server started at %s:%s successfully", config.MainServerHost, config.MainServerPort)
-	err = server.Start(fmt.Sprintf("%s:%s", config.MainServerHost, config.MainServerPort))
-	if err != nil {
-		log.Error().Err(err).Msg("cannot start server")
-	}
+	/* 运行 http 服务 */
+	runHttpServer(config, store)
 }
 
 func runDBMigrate(config util.Config) error {
@@ -67,13 +54,34 @@ func runDBMigrate(config util.Config) error {
 		fmt.Sprintf("%s://%s:%s@tcp(%s:%s)/%s", config.DBDriver, config.DBUsername, config.DBPassword, config.DBHost, config.DBPort, config.DBName),
 	)
 	if err != nil {
-		log.Error().Err(err).Msg("cannot create migration instance")
 		return err
 	}
 	if err = m.Up(); err != nil && err != migrate.ErrNoChange {
-		log.Error().Err(err).Msg("failed to run migrate up")
 		return err
 	}
-	log.Info().Msg("db migrated successfully")
 	return nil
+}
+
+func getDBStore(config util.Config) (*db.Store, error) {
+	conn, err := sql.Open(
+		config.DBDriver,
+		fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true", config.DBUsername, config.DBPassword, config.DBHost, config.DBPort, config.DBName),
+	)
+	if err != nil {
+		return nil, err
+	}
+	store := db.NewStore(conn)
+	return store, nil
+}
+
+func runHttpServer(config util.Config, store *db.Store) {
+	server, err := http.NewServer(config, store)
+	if err != nil {
+		log.Error().Err(err).Msg("cannot create server")
+		return
+	}
+
+	if err := server.Start(); err != nil {
+		log.Error().Err(err).Msg("failed to start server")
+	}
 }
