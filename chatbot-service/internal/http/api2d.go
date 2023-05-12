@@ -8,7 +8,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/Banana-Boat/terryminal/bot-service/internal/util"
+	"github.com/Banana-Boat/terryminal/chatbot-service/internal/util"
 	"github.com/sashabaranov/go-openai"
 )
 

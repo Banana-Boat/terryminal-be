@@ -3,8 +3,8 @@ package main
 import (
 	"os"
 
-	"github.com/Banana-Boat/terryminal/bot-service/internal/http"
-	"github.com/Banana-Boat/terryminal/bot-service/internal/util"
+	"github.com/Banana-Boat/terryminal/chatbot-service/internal/http"
+	"github.com/Banana-Boat/terryminal/chatbot-service/internal/util"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )

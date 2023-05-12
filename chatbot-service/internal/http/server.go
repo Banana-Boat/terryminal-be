@@ -3,7 +3,7 @@ package http
 import (
 	"fmt"
 
-	"github.com/Banana-Boat/terryminal/bot-service/internal/util"
+	"github.com/Banana-Boat/terryminal/chatbot-service/internal/util"
 	"github.com/gin-gonic/gin"
 )
 
@@ -32,7 +32,7 @@ func (server *Server) setupRouter() {
 
 func (server *Server) Start() error {
 	if err := server.router.Run(
-		fmt.Sprintf("%s:%s", server.config.BotHttpServerHost, server.config.BotHttpServerPort),
+		fmt.Sprintf("%s:%s", server.config.ChatbotHttpServerHost, server.config.ChatbotHttpServerPort),
 	); err != nil {
 		return err
 	}

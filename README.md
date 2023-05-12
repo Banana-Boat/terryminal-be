@@ -22,7 +22,7 @@ _待补全..._
 - gateway-service 端口范围：3200-3209
 - terminal-service 端口范围：3210-3219
 - pty-docker 端口范围：3220-3229
-- bot-service 端口范围：3230-3239
+- chatbot-service 端口范围：3230-3239
 
 ## 接口文档
 

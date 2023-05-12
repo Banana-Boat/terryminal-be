@@ -19,11 +19,11 @@ jobs:
         with:
           go-version: 1.19
 
-      - name: Test main-service
-        run: make -C ./main-service remote_test
+      - name: Test gateway-service
+        run: make -C ./gateway-service remote_test
 
       - name: Test terminal-service
         run: make -C ./terminal-service remote_test
 
-      - name: Test bot-service
-        run: make -C ./bot-service remote_test
+      - name: Test chatbot-service
+        run: make -C ./chatbot-service remote_test

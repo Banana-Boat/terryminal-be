@@ -5,8 +5,8 @@ import (
 )
 
 type Config struct {
-	BotHttpServerHost string `mapstructure:"BOT_HTTP_SERVER_HOST"`
-	BotHttpServerPort string `mapstructure:"BOT_HTTP_SERVER_PORT"`
+	ChatbotHttpServerHost string `mapstructure:"CHATBOT_HTTP_SERVER_HOST"`
+	ChatbotHttpServerPort string `mapstructure:"CHATBOT_HTTP_SERVER_PORT"`
 
 	RedisHost string `mapstructure:"REDIS_HOST"`
 	RedisPort string `mapstructure:"REDIS_PORT"`

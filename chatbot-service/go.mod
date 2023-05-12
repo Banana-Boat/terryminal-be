@@ -1,4 +1,4 @@
-module github.com/Banana-Boat/terryminal/bot-service
+module github.com/Banana-Boat/terryminal/chatbot-service
 
 go 1.19
 
