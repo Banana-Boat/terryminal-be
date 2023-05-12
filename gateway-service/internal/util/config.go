@@ -7,8 +7,8 @@ import (
 )
 
 type Config struct {
-	MainServerHost      string `mapstructure:"MAIN_SERVER_HOST"`
-	MainServerPort      string `mapstructure:"MAIN_SERVER_PORT"`
+	GatewayServerHost   string `mapstructure:"GATEWAY_SERVER_HOST"`
+	GatewayServerPort   string `mapstructure:"GATEWAY_SERVER_PORT"`
 	TerminalServiceHost string `mapstructure:"TERMINAL_SERVICE_HOST"`
 	TerminalServicePort string `mapstructure:"TERMINAL_SERVICE_PORT"`
 
@@ -23,14 +23,6 @@ type Config struct {
 	TokenSymmetricKey   string        `mapstructure:"TOKEN_SYMMETRIC_KEY"`
 	AccessTokenDuration time.Duration `mapstructure:"ACCESS_TOKEN_DURATION"`
 }
-
-// # 主服务地址
-// MAIN_SERVER_HOST=0.0.0.0
-// MAIN_SERVER_PORT=8080
-
-// # 邮件服务地址
-// TERMINAL_SERVICE_HOST=localhost
-// TERMINAL_SERVICE_PORT=8081
 
 func LoadConfig(path string) (config Config, err error) {
 	viper.AddConfigPath(path)

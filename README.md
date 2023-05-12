@@ -19,7 +19,7 @@ _待补全..._
 
 为便于本地调试，划分不同服务所使用的端口，作以下规定：
 
-- main-service 端口范围：3200-3209
+- gateway-service 端口范围：3200-3209
 - terminal-service 端口范围：3210-3219
 - pty-docker 端口范围：3220-3229
 - bot-service 端口范围：3230-3239

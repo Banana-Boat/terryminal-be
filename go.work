@@ -2,6 +2,6 @@ go 1.19
 
 use (
 	./terminal-service
-	./main-service
+	./gateway-service
 	./bot-service
 )

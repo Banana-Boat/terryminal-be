@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/Banana-Boat/terryminal/main-service/internal/db"
-	"github.com/Banana-Boat/terryminal/main-service/internal/pb"
-	"github.com/Banana-Boat/terryminal/main-service/internal/util"
+	"github.com/Banana-Boat/terryminal/gateway-service/internal/db"
+	"github.com/Banana-Boat/terryminal/gateway-service/internal/pb"
+	"github.com/Banana-Boat/terryminal/gateway-service/internal/util"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"

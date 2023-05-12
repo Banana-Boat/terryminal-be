@@ -8,9 +8,9 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 
-	"github.com/Banana-Boat/terryminal/main-service/internal/db"
-	"github.com/Banana-Boat/terryminal/main-service/internal/http"
-	"github.com/Banana-Boat/terryminal/main-service/internal/util"
+	"github.com/Banana-Boat/terryminal/gateway-service/internal/db"
+	"github.com/Banana-Boat/terryminal/gateway-service/internal/http"
+	"github.com/Banana-Boat/terryminal/gateway-service/internal/util"
 	_ "github.com/go-sql-driver/mysql"
 
 	"github.com/golang-migrate/migrate/v4"
