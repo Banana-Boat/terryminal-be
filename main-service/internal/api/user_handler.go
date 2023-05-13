@@ -1,10 +1,10 @@
-package http
+package api
 
 import (
 	"net/http"
 
-	"github.com/Banana-Boat/terryminal/gateway-service/internal/db"
-	"github.com/Banana-Boat/terryminal/gateway-service/internal/util"
+	"github.com/Banana-Boat/terryminal/main-service/internal/db"
+	"github.com/Banana-Boat/terryminal/main-service/internal/util"
 	"github.com/gin-gonic/gin"
 )
 

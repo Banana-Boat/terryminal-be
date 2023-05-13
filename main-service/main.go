@@ -8,9 +8,9 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 
-	"github.com/Banana-Boat/terryminal/gateway-service/internal/db"
-	"github.com/Banana-Boat/terryminal/gateway-service/internal/http"
-	"github.com/Banana-Boat/terryminal/gateway-service/internal/util"
+	"github.com/Banana-Boat/terryminal/main-service/internal/api"
+	"github.com/Banana-Boat/terryminal/main-service/internal/db"
+	"github.com/Banana-Boat/terryminal/main-service/internal/util"
 	_ "github.com/go-sql-driver/mysql"
 
 	"github.com/golang-migrate/migrate/v4"
@@ -75,7 +75,7 @@ func getDBStore(config util.Config) (*db.Store, error) {
 }
 
 func runHttpServer(config util.Config, store *db.Store) {
-	server, err := http.NewServer(config, store)
+	server, err := api.NewServer(config, store)
 	if err != nil {
 		log.Error().Err(err).Msg("cannot create server")
 		return

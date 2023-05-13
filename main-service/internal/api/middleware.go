@@ -1,11 +1,11 @@
-package http
+package api
 
 import (
 	"errors"
 	"net/http"
 	"strings"
 
-	"github.com/Banana-Boat/terryminal/gateway-service/internal/util"
+	"github.com/Banana-Boat/terryminal/main-service/internal/util"
 	"github.com/gin-gonic/gin"
 )
 

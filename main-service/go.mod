@@ -1,4 +1,4 @@
-module github.com/Banana-Boat/terryminal/gateway-service
+module github.com/Banana-Boat/terryminal/main-service
 
 go 1.19
 

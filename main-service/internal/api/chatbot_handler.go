@@ -1,4 +1,4 @@
-package http
+package api
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	"github.com/Banana-Boat/terryminal/gateway-service/internal/pb"
+	"github.com/Banana-Boat/terryminal/main-service/internal/pb"
 )
 
 type chatRequest struct {

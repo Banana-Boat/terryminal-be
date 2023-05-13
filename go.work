@@ -2,6 +2,6 @@ go 1.19
 
 use (
 	./terminal-service
-	./gateway-service
+	./main-service
 	./chatbot-service
 )

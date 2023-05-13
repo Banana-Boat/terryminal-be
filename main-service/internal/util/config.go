@@ -7,8 +7,8 @@ import (
 )
 
 type Config struct {
-	GatewayServerHost   string `mapstructure:"GATEWAY_SERVER_HOST"`
-	GatewayServerPort   string `mapstructure:"GATEWAY_SERVER_PORT"`
+	MainServerHost      string `mapstructure:"MAIN_SERVER_HOST"`
+	MainServerPort      string `mapstructure:"MAIN_SERVER_PORT"`
 	TerminalServiceHost string `mapstructure:"TERMINAL_SERVICE_HOST"`
 	TerminalServicePort string `mapstructure:"TERMINAL_SERVICE_PORT"`
 	ChatbotServiceHost  string `mapstructure:"CHATBOT_SERVICE_HOST"`

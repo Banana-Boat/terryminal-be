@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package pb;
 
-option go_package = "github.com/Banana-Boat/terryminal/gateway-service/internal/pb";
+option go_package = "github.com/Banana-Boat/terryminal/main-service/internal/pb";
 
 /* Chat */
 message ChatRequest {

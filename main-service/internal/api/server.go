@@ -1,10 +1,10 @@
-package http
+package api
 
 import (
 	"fmt"
 
-	"github.com/Banana-Boat/terryminal/gateway-service/internal/db"
-	"github.com/Banana-Boat/terryminal/gateway-service/internal/util"
+	"github.com/Banana-Boat/terryminal/main-service/internal/db"
+	"github.com/Banana-Boat/terryminal/main-service/internal/util"
 	"github.com/gin-gonic/gin"
 )
 
@@ -34,7 +34,7 @@ func NewServer(config util.Config, store *db.Store) (*Server, error) {
 
 func (server *Server) Start() error {
 	if err := server.router.Run(
-		fmt.Sprintf("%s:%s", server.config.GatewayServerHost, server.config.GatewayServerPort),
+		fmt.Sprintf("%s:%s", server.config.MainServerHost, server.config.MainServerPort),
 	); err != nil {
 		return err
 	}
