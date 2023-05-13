@@ -9,9 +9,11 @@ _待补全..._
 ## 架构图
 
 ```mermaid
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
 flowchart LR
   id_client(((Clients))) --HTTP--- id_main("`**Main Service**
-  API网关 / 鉴权\n用户相关 / 终端交互`")
+  API网关 / 鉴权
+  用户相关 / 终端交互`")
   id_client --Websocket--- id_main
 
   subgraph Terryminal Services
