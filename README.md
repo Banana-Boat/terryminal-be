@@ -6,6 +6,29 @@ The backend of Terry's online Terminal
 
 _待补全..._
 
+## 架构图
+
+```mermaid
+flowchart LR
+  id_client(((Clients))) --HTTP--- id_main(Main Service\nAPI网关 / 鉴权\n用户相关 / 终端交互)
+  id_client --Websocket--- id_main
+
+  subgraph Terryminal Services
+  id_main --gRPC--- id_chatbot(Chatbot Service\nAI机器人)
+  id_main --Docker Engine API--- Docker
+  end
+
+  subgraph DataBase
+  id_main -.- id_mysql[(Mysql DB)]
+  id_chatbot -.- id_mysql
+  id_main -.- id_redis[(Redis MQ)]
+  end
+
+  subgraph Docker
+  id_main --gRPC--- id_bash(Pty Container\n内置Node服务)
+  end
+```
+
 ## 主要依赖
 
 - [**gRPC**](https://grpc.io/)
