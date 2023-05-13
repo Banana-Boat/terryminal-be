@@ -10,11 +10,13 @@ _待补全..._
 
 ```mermaid
 flowchart LR
-  id_client(((Clients))) --HTTP--- id_main(Main Service\nAPI网关 / 鉴权\n用户相关 / 终端交互)
+  id_client(((Clients))) --HTTP--- id_main("`**Main Service**
+  API网关 / 鉴权\n用户相关 / 终端交互`")
   id_client --Websocket--- id_main
 
   subgraph Terryminal Services
-  id_main --gRPC--- id_chatbot(Chatbot Service\nAI机器人)
+  id_main --gRPC--- id_chatbot("`**Chatbot Service**
+  AI机器人`")
   id_main --Docker Engine API--- Docker
   end
 
@@ -25,7 +27,8 @@ flowchart LR
   end
 
   subgraph Docker
-  id_main --gRPC--- id_bash(Pty Container\n内置Node服务)
+  id_main --gRPC--- id_bash("`**Pty Container**
+  内置Node服务`")
   end
 ```
 
