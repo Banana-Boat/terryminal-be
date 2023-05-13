@@ -31,7 +31,7 @@ mysql: ## 启动mysql容器（需要指定DB_PASSWORD与DB_NAME）
 ifeq (${DB_PASSWORD}${DB_NAME},)
 	@echo "missing parameter DB_PASSWORD and DB_NAME"
 else
-	docker run --name terryminal-mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=${DB_PASSWORD} -e MYSQL_DATABASE=${DB_NAME} -d mysql:8.0
+	docker run --name terryminal-mysql --network terryminal  -p 3306:3306 -e MYSQL_ROOT_PASSWORD=${DB_PASSWORD} -e MYSQL_DATABASE=${DB_NAME} -d mysql:8.0
 endif
 
 .PHONY: migrate_init
@@ -42,10 +42,27 @@ migrate_init:	## 生成migrate模版文件
 sqlc: ## 根据sql文件生成go代码
 	sqlc generate
 
-# =================================================服务运行=======================================================
+# =================================================服务运行（直接）=======================================================
 .PHONY: run
 run: ## 启动服务
 	go run main.go
+
+# =================================================服务运行（docker）====================================================
+.PHONY: build_image
+build_image: ## 构建镜像
+	docker build -t terryminal-main:dev .
+
+.PHONY: run_docker
+run_docker: ## 启动服务（docker）
+	docker run -v /var/run/docker.sock:/var/run/docker.sock \
+	-e MIGRATION_FILE_URL=file://migration -e DB_HOST=terryminal-mysql \
+	--name terryminal-main --network terryminal -p 3200:3200 terryminal-main:dev
+
+.PHONY: clean_docker
+clean_docker: ## 停止容器并删除容器与镜像
+	docker stop terryminal-main
+	docker rm terryminal-main
+	docker rmi terryminal-main:dev
 
 
 

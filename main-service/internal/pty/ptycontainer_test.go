@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Banana-Boat/terryminal/terminal-service/internal/pb"
-	"github.com/Banana-Boat/terryminal/terminal-service/internal/util"
+	"github.com/Banana-Boat/terryminal/main-service/internal/pb"
+	"github.com/Banana-Boat/terryminal/main-service/internal/util"
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"

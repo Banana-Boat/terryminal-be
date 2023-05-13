@@ -25,7 +25,7 @@ func newUserOfResponse(user db.User) userOfResponse {
 	}
 }
 
-func (server *Server) register(ctx *gin.Context) {
+func (server *Server) registerHandle(ctx *gin.Context) {
 	var req registerRequest
 
 	/* 通过gin的binding校验参数合法性 */
@@ -76,7 +76,7 @@ type listUserRequest struct {
 	PageSize int32 `form:"pageSize" binding:"required,min=5,max=10"`
 }
 
-func (server *Server) listUsers(ctx *gin.Context) {
+func (server *Server) listUsersHandle(ctx *gin.Context) {
 	var req listUserRequest
 	if err := ctx.ShouldBindQuery(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, wrapResponse(false, err.Error(), nil))
@@ -102,7 +102,7 @@ type loginRequest struct {
 	Password string `json:"password" binding:"required"`
 }
 
-func (server *Server) login(ctx *gin.Context) {
+func (server *Server) loginHandle(ctx *gin.Context) {
 	var req loginRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, wrapResponse(false, err.Error(), nil))

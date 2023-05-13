@@ -1,19 +1,19 @@
-package ws
+package api
 
 import (
 	"context"
 	"fmt"
 	"io"
 
-	"github.com/Banana-Boat/terryminal/terminal-service/internal/pb"
-	"github.com/Banana-Boat/terryminal/terminal-service/internal/pty"
-	"github.com/Banana-Boat/terryminal/terminal-service/internal/util"
+	"github.com/Banana-Boat/terryminal/main-service/internal/pb"
+	"github.com/Banana-Boat/terryminal/main-service/internal/pty"
+	"github.com/Banana-Boat/terryminal/main-service/internal/util"
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-func startHandle(wsCtx *WSContext, ptyID string, config util.Config) {
+func startEventHandle(wsCtx *WSContext, ptyID string, config util.Config) {
 	/* 创建容器并启动 */
 	basePtyContainer, err := pty.NewPtyContainer(
 		config.BasePtyImageName, ptyID, config.BasePtyNetwork, nil,
@@ -77,7 +77,7 @@ func startHandle(wsCtx *WSContext, ptyID string, config util.Config) {
 	sendMessage(wsCtx.conn, ptyID, "start", StartServerData{Result: true})
 }
 
-func runCmdHandle(wsCtx *WSContext, ptyID string, cmd string) {
+func runCmdEventHandle(wsCtx *WSContext, ptyID string, cmd string) {
 	if cmd == "exit" { // 后续需要补充退出的命令 Ctr+D / Ctrl+C
 		log.Warn().Msgf("receive invalid command: %s", cmd)
 		sendMessage(wsCtx.conn, ptyID, "run-cmd", RunCmdServerData{IsError: true, Result: "命令不合法"})
@@ -90,7 +90,7 @@ func runCmdHandle(wsCtx *WSContext, ptyID string, cmd string) {
 	})
 }
 
-func endHandle(wsCtx *WSContext, ptyID string) {
+func endEventHandle(wsCtx *WSContext, ptyID string) {
 	if err := destroy(wsCtx, ptyID); err != nil {
 		log.Error().Err(err).Msgf("PtyID: %s, failed to remove pty container and close gRPC client", ptyID)
 	}

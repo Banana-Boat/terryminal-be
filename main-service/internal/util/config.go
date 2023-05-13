@@ -7,12 +7,10 @@ import (
 )
 
 type Config struct {
-	MainServerHost      string `mapstructure:"MAIN_SERVER_HOST"`
-	MainServerPort      string `mapstructure:"MAIN_SERVER_PORT"`
-	TerminalServiceHost string `mapstructure:"TERMINAL_SERVICE_HOST"`
-	TerminalServicePort string `mapstructure:"TERMINAL_SERVICE_PORT"`
-	ChatbotServiceHost  string `mapstructure:"CHATBOT_SERVICE_HOST"`
-	ChatbotServicePort  string `mapstructure:"CHATBOT_SERVICE_PORT"`
+	MainServerHost     string `mapstructure:"MAIN_SERVER_HOST"`
+	MainServerPort     string `mapstructure:"MAIN_SERVER_PORT"`
+	ChatbotServiceHost string `mapstructure:"CHATBOT_SERVICE_HOST"`
+	ChatbotServicePort string `mapstructure:"CHATBOT_SERVICE_PORT"`
 
 	MigrationFileUrl string `mapstructure:"MIGRATION_FILE_URL"`
 	DBDriver         string `mapstructure:"DB_DRIVER"`
@@ -24,6 +22,11 @@ type Config struct {
 
 	TokenSymmetricKey   string        `mapstructure:"TOKEN_SYMMETRIC_KEY"`
 	AccessTokenDuration time.Duration `mapstructure:"ACCESS_TOKEN_DURATION"`
+
+	BasePtyHost      string `mapstructure:"BASE_PTY_HOST"`
+	BasePtyPort      string `mapstructure:"BASE_PTY_PORT"`
+	BasePtyImageName string `mapstructure:"BASE_PTY_IMAGE_NAME"`
+	BasePtyNetwork   string `mapstructure:"BASE_PTY_NETWORK"`
 }
 
 func LoadConfig(path string) (config Config, err error) {

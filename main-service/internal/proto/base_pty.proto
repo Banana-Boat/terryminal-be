@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 // protoc的目标为GO语言，则需要指定go_package。其值为.go代码的完整导入路径
-option go_package = "github.com/Banana-Boat/terryminal/terminal-service/internal/pb";
+option go_package = "github.com/Banana-Boat/terryminal/main-service/internal/pb";
 
 message RunCmdRequest {
   string cmd = 1;

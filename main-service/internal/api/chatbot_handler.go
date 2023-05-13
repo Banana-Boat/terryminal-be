@@ -17,7 +17,7 @@ type chatRequest struct {
 	Messages []*pb.ChatRequest_ChatMessage `json:"messages" binding:"required"`
 }
 
-func (server *Server) chat(ctx *gin.Context) {
+func (server *Server) chatHandle(ctx *gin.Context) {
 	/* 设置响应头 */
 	ctx.Writer.Header().Set("Content-Type", "text/event-stream")
 	ctx.Writer.Header().Set("Cache-Control", "no-cache")
@@ -72,5 +72,4 @@ func (server *Server) chat(ctx *gin.Context) {
 		ctx.SSEvent(resp.Event, resp.Data)
 		return true
 	})
-
 }

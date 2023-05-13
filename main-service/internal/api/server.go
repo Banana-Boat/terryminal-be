@@ -45,14 +45,14 @@ func (server *Server) Start() error {
 func (server *Server) setupRouter() {
 	router := gin.Default()
 
-	router.POST("/user/login", server.login)
-	router.POST("/user/register", server.register)
+	router.POST("/user/login", server.loginHandle)
+	router.POST("/user/register", server.registerHandle)
 
 	authRouter := router.Group("/").Use(authMiddleware(server.tokenMaker))
-	authRouter.GET("/user/listUsers", server.listUsers)
+	authRouter.GET("/user/listUsers", server.listUsersHandle)
 
-	// authRouter.POST("/chatbot/chat", server.chat)
-	router.POST("/chatbot/chat", server.chat)
+	router.POST("/chatbot/chat", server.chatHandle)
+	router.GET("/terminal/ws", server.terminalWSHandle)
 
 	server.router = router
 }
