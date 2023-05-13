@@ -29,3 +29,18 @@ local_test: ## 本地执行的测试
 .PHONY: run
 run: ## 启动服务
 	go run main.go
+
+# =================================================服务运行（docker）====================================================
+.PHONY: build_image
+build_image: ## 构建镜像
+	docker build -t terryminal-chatbot:dev .
+
+.PHONY: run_docker
+run_docker: ## 启动服务（docker）
+	docker run --name terryminal-chatbot --network terryminal -p 3230:3230 terryminal-chatbot:dev
+
+.PHONY: clean_docker
+clean_docker: ## 停止容器并删除容器与镜像
+	docker stop terryminal-chatbot
+	docker rm terryminal-chatbot
+	docker rmi terryminal-chatbot:dev

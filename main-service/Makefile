@@ -55,7 +55,9 @@ build_image: ## 构建镜像
 .PHONY: run_docker
 run_docker: ## 启动服务（docker）
 	docker run -v /var/run/docker.sock:/var/run/docker.sock \
-	-e MIGRATION_FILE_URL=file://migration -e DB_HOST=terryminal-mysql \
+	-e MIGRATION_FILE_URL=file://migration \
+	-e DB_HOST=terryminal-mysql \
+	-e CHATBOT_SERVICE_HOST=terryminal-chatbot \
 	--name terryminal-main --network terryminal -p 3200:3200 terryminal-main:dev
 
 .PHONY: clean_docker
