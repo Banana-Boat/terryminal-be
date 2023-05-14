@@ -36,8 +36,8 @@ erDiagram
     USER ||--o{ TERMINAL : own
     TERMINAL ||--|| TERMINAL_TEMPLATE : instantiated-from
     USER {
-        int id
-        string email "邮箱"
+        int id PK
+        string email UK "邮箱"
         string nickname "昵称"
         string password "密码"
         int chatbot_token "Chatbot服务剩余Token数"
@@ -45,19 +45,19 @@ erDiagram
         datetime updated_at
     }
     TERMINAL {
-        int id
-        string name "实例名称（同Docker容器名）"
+        int id PK
+        string name UK "实例名称（同Docker容器名）"
         decimal size "Docker容器体积"
         string remark "用户备注"
-        int owner_id "所有者ID"
-        int template_id "模版ID"
+        int owner_id FK "所有者ID"
+        int template_id FK "模版ID"
         time total_duration "累计使用时长"
         datetime created_at
         datetime updated_at
     }
     TERMINAL_TEMPLATE {
-        int id
-        string name "模版名称"
+        int id PK
+        string name UK "模版名称"
         string image_name "Docker镜像名"
         decimal size "Docker镜像体积"
         string description "模版描述"
@@ -85,7 +85,7 @@ erDiagram
 
 ## 接口文档
 
-_待补全..._
+[**API 文档**](https://www.apifox.cn/apidoc/shared-3e28c033-bc0d-436e-93de-6f0e6045d53d)
 
 ## 服务端部署
 
