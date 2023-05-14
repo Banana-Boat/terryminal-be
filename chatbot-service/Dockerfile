@@ -12,6 +12,6 @@ WORKDIR /app
 COPY --from=builder /app/main .
 COPY ./app.env .
 
-EXPOSE 3230
+EXPOSE 3210
 
 CMD [ "/app/main" ]

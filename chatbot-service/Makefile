@@ -37,7 +37,7 @@ build_image: ## 构建镜像
 
 .PHONY: run_docker
 run_docker: ## 启动服务（docker）
-	docker run --name terryminal-chatbot --network terryminal -p 3230:3230 terryminal-chatbot:dev
+	docker run --name terryminal-chatbot --network terryminal -p 3210:3210 terryminal-chatbot:dev
 
 .PHONY: clean_docker
 clean_docker: ## 停止容器并删除容器与镜像

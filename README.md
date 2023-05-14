@@ -29,6 +29,42 @@ flowchart LR
   end
 ```
 
+## ER 图
+
+```mermaid
+erDiagram
+    USER ||--o{ TERMINAL : own
+    TERMINAL ||--|| TERMINAL_TEMPLATE : instantiated-from
+    USER {
+        int id
+        string email "邮箱"
+        string nickname "昵称"
+        string password "密码"
+        int chatbot_token "Chatbot服务剩余Token数"
+        datetime created_at
+        datetime updated_at
+    }
+    TERMINAL {
+        int id
+        int owner_id "所有者id"
+        int template_id "模版ID"
+        string container_name "Docker容器名称"
+        decimal container_size "Docker容器体积"
+        time total_duration "累计使用时长"
+        string remark "用户备注"
+        datetime created_at
+        datetime updated_at
+    }
+    TERMINAL_TEMPLATE {
+        int id
+        string image_name "Docker镜像名"
+        decimal image_size "Docker镜像体积"
+        string description "模版描述"
+        datetime created_at
+        datetime updated_at
+    }
+```
+
 ## 主要依赖
 
 - [**gRPC**](https://grpc.io/)
@@ -43,8 +79,8 @@ flowchart LR
 为便于本地调试，划分不同服务所使用的端口，作以下规定：
 
 - main-service 端口范围：3200-3209
+- chatbot-service 端口范围：3210-3219
 - pty-docker 端口范围：3220-3229
-- chatbot-service 端口范围：3230-3239
 
 ## 接口文档
 
