@@ -11,21 +11,24 @@ CREATE TABLE IF NOT EXISTS `users` (
 
 CREATE TABLE IF NOT EXISTS `terminals` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(64) NOT NULL UNIQUE,
+  `size` DECIMAL(7, 2) NOT NULL,
+  `remark` VARCHAR(1024),
   `owner_id` BIGINT UNSIGNED NOT NULL,
   `template_id` BIGINT UNSIGNED NOT NULL,
-  `container_name` VARCHAR(64) NOT NULL,
-  `container_size` DECIMAL(7, 2) NOT NULL,
   `total_duration` TIME NOT NULL DEFAULT '00:00:00',
-  `remark` VARCHAR(1024),
   `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
+  FOREIGN KEY (`owner_id`) REFERENCES `users`(`id`),
+  FOREIGN KEY (`template_id`) REFERENCES `terminal_templates`(`id`)
 );
 
 CREATE TABLE IF NOT EXISTS `terminal_templates` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(64) NOT NULL UNIQUE,
   `image_name` VARCHAR(64) NOT NULL,
-  `image_size` DECIMAL(7, 2) NOT NULL,
+  `size` DECIMAL(7, 2) NOT NULL,
   `description` VARCHAR(1024),
   `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,

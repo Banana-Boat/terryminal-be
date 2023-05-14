@@ -46,19 +46,20 @@ erDiagram
     }
     TERMINAL {
         int id
-        int owner_id "所有者id"
-        int template_id "模版ID"
-        string container_name "Docker容器名称"
-        decimal container_size "Docker容器体积"
-        time total_duration "累计使用时长"
+        string name "实例名称（同Docker容器名）"
+        decimal size "Docker容器体积"
         string remark "用户备注"
+        int owner_id "所有者ID"
+        int template_id "模版ID"
+        time total_duration "累计使用时长"
         datetime created_at
         datetime updated_at
     }
     TERMINAL_TEMPLATE {
         int id
+        string name "模版名称"
         string image_name "Docker镜像名"
-        decimal image_size "Docker镜像体积"
+        decimal size "Docker镜像体积"
         string description "模版描述"
         datetime created_at
         datetime updated_at
