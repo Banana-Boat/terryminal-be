@@ -27,6 +27,10 @@ flowchart LR
   subgraph Docker
   id_main --gRPC--- id_bash(Pty Container\n内置Node服务)
   end
+
+  subgraph 第三方API
+  id_gpt(OpenAI ChatGPT3.5) --HTTP--- id_chatbot
+  end
 ```
 
 ## ER 图

@@ -27,6 +27,7 @@ func (server *Server) chatHandle(ctx *gin.Context) {
 	/* 解析请求参数 */
 	var req chatRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
+		log.Error().Err(err).Msg("wrong request params")
 		ctx.SSEvent("error", err.Error()) // 向客户端发送错误信息
 		return
 	}

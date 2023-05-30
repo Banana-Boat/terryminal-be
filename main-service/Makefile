@@ -61,7 +61,9 @@ run_docker: ## 启动服务（docker）
 	--name terryminal-main --network terryminal -p 3200:3200 terryminal-main:dev
 
 .PHONY: clean_docker
-clean_docker: ## 停止容器并删除容器与镜像
+clean_docker: ## 停止容器并删除容器与镜像（main & mysql）
+	docker stop terryminal-mysql
+	docker rm terryminal-mysql
 	docker stop terryminal-main
 	docker rm terryminal-main
 	docker rmi terryminal-main:dev
