@@ -23,7 +23,7 @@ func (server *Server) Chat(req *pb.ChatRequest, stream pb.Chatbot_ChatServer) er
 	api2dClient := NewApi2dClient(server.config)
 	api2dStream, err := api2dClient.CreateStream(messages)
 	if err != nil {
-		log.Err(err).Msg("CreateStream failed")
+		log.Error().Err(err).Msg("CreateStream failed")
 	}
 	defer api2dStream.Close()
 
@@ -45,7 +45,7 @@ func (server *Server) Chat(req *pb.ChatRequest, stream pb.Chatbot_ChatServer) er
 				)
 				tokens, err := CalTokenCost(messages, openai.GPT3Dot5Turbo)
 				if err != nil {
-					log.Err(err).Msg("CalTokenCost failed")
+					log.Error().Err(err).Msg("CalTokenCost failed")
 				} else {
 					log.Info().Msgf("Token cost: %d", tokens)
 				}
@@ -56,7 +56,7 @@ func (server *Server) Chat(req *pb.ChatRequest, stream pb.Chatbot_ChatServer) er
 			}
 
 			/* 流数据读取错误 */
-			log.Err(err).Msg("Stream read failed")
+			log.Error().Err(err).Msg("Stream read failed")
 			stream.Send(&pb.ChatResponse{Event: "error", Data: err.Error()})
 			break
 		}

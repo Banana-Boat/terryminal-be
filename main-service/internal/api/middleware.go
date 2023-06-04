@@ -39,7 +39,7 @@ func authMiddleware(tokenMaker *util.TokenMaker) gin.HandlerFunc {
 			return
 		}
 
-		ctx.Set("auth_payload", payload)
+		ctx.Set("token_payload", payload)
 		ctx.Next()
 	}
 }

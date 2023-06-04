@@ -5,13 +5,38 @@
 package db
 
 import (
+	"database/sql"
 	"time"
 )
 
+type Terminal struct {
+	ID            int64          `json:"id"`
+	Name          string         `json:"name"`
+	Size          string         `json:"size"`
+	Remark        sql.NullString `json:"remark"`
+	OwnerID       int64          `json:"ownerID"`
+	TemplateID    int64          `json:"templateID"`
+	TotalDuration time.Time      `json:"totalDuration"`
+	CreatedAt     time.Time      `json:"createdAt"`
+	UpdatedAt     time.Time      `json:"updatedAt"`
+}
+
+type TerminalTemplate struct {
+	ID          int64          `json:"id"`
+	Name        string         `json:"name"`
+	ImageName   string         `json:"imageName"`
+	Size        string         `json:"size"`
+	Description sql.NullString `json:"description"`
+	CreatedAt   time.Time      `json:"createdAt"`
+	UpdatedAt   time.Time      `json:"updatedAt"`
+}
+
 type User struct {
-	ID        int32     `json:"id"`
-	Username  string    `json:"username"`
-	Password  string    `json:"password"`
-	CreatedAt time.Time `json:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt"`
+	ID           int64     `json:"id"`
+	Email        string    `json:"email"`
+	Nickname     string    `json:"nickname"`
+	Password     string    `json:"password"`
+	ChatbotToken int32     `json:"chatbotToken"`
+	CreatedAt    time.Time `json:"createdAt"`
+	UpdatedAt    time.Time `json:"updatedAt"`
 }

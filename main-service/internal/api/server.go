@@ -49,7 +49,7 @@ func (server *Server) setupRouter() {
 	router.POST("/user/register", server.registerHandle)
 
 	authRouter := router.Group("/").Use(authMiddleware(server.tokenMaker))
-	authRouter.GET("/user/listUsers", server.listUsersHandle)
+	authRouter.PATCH("/user/updateInfo", server.updateInfoHandle)
 
 	router.POST("/chatbot/chat", server.chatHandle)
 	router.GET("/terminal/ws", server.terminalWSHandle)

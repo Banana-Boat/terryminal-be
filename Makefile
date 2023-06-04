@@ -21,7 +21,7 @@ build_images: ## 构建镜像
 remove_images: ##	删除镜像
 	@echo "Removing all the images..."
 	docker rmi ${DOCKER_USERNAME}/terryminal-main:${MAIN_VERSION}
-	docker rmi ${DOCKER_USERNAME}/terryminal-chatbot:${CHATBOT_VERSION}
+# docker rmi ${DOCKER_USERNAME}/terryminal-chatbot:${CHATBOT_VERSION}
 
 .PHONY: build_push_multi
 build_push_multi: ## 构建支持多架构的镜像，并推到hub（镜像不保存到本地）

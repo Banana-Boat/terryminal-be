@@ -1,33 +1,25 @@
 -- name: CreateUser :execresult
 INSERT INTO users (
-  username, password
+  email, nickname, password
 ) VALUES (
-  ?, ?
+  ?, ?, ?
 );
 
--- name: IsExistUser :one
+-- name: IsUserExisted :one
 SELECT EXISTS(
   SELECT 1 FROM users
-  WHERE username = ? LIMIT 1
+  WHERE email = ? LIMIT 1
 );
 
 -- name: GetUserById :one
 SELECT * FROM users
 WHERE id = ? LIMIT 1;
 
--- name: GetUserByUsername :one
+-- name: GetUserByEmail :one
 SELECT * FROM users
-WHERE username = ? LIMIT 1;
-
--- name: ListUsers :many
-SELECT * FROM users
-ORDER BY id
-LIMIT ? OFFSET ?;
+WHERE email = ? LIMIT 1;
 
 -- name: UpdateUser :exec
-UPDATE users SET password = ?
-WHERE id = ?;
-
--- name: DeleteUser :exec
-DELETE FROM users
+UPDATE users 
+SET password = ?, nickname = ?, chatbot_token = ?, updated_at = ?
 WHERE id = ?;

@@ -9,9 +9,9 @@ import (
 	"github.com/o1egl/paseto"
 )
 
-type payload struct {
-	ID        int32     `json:"id"`
-	Username  string    `json:"username"`
+type TokenPayload struct {
+	ID        int64     `json:"id"`
+	Email     string    `json:"email"`
 	ExpiredAt time.Time `json:"expiredAt"`
 }
 
@@ -33,10 +33,10 @@ func NewTokenMaker(symmetricKey string) (*TokenMaker, error) {
 	return maker, nil
 }
 
-func (maker *TokenMaker) CreateToken(id int32, username string, duration time.Duration) (string, error) {
-	payload := &payload{
+func (maker *TokenMaker) CreateToken(id int64, email string, duration time.Duration) (string, error) {
+	payload := &TokenPayload{
 		ID:        id,
-		Username:  username,
+		Email:     email,
 		ExpiredAt: time.Now().Add(duration),
 	}
 
@@ -44,8 +44,8 @@ func (maker *TokenMaker) CreateToken(id int32, username string, duration time.Du
 	return token, err
 }
 
-func (maker *TokenMaker) VerifyToken(token string) (*payload, error) {
-	payload := &payload{}
+func (maker *TokenMaker) VerifyToken(token string) (*TokenPayload, error) {
+	payload := &TokenPayload{}
 
 	err := maker.paseto.Decrypt(token, maker.symmetricKey, payload, nil)
 	if err != nil {
