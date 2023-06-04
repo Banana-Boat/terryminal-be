@@ -1,12 +1,13 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/Banana-Boat/terryminal/main-service/internal/db"
-	"github.com/Banana-Boat/terryminal/main-service/internal/util"
 	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
 
 	"github.com/rs/zerolog/log"
 )
@@ -30,6 +31,19 @@ func newUserOfResponse(user db.User) userOfResponse {
 		CreatedAt:    user.CreatedAt,
 		UpdatedAt:    user.UpdatedAt,
 	}
+}
+
+/* 密码的加密与验证 */
+func hashPassword(password string) (string, error) {
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return "", fmt.Errorf("failed to hash password: %w", err)
+	}
+	return string(hashedPassword), nil
+}
+
+func checkPassword(password string, hashedPassword string) error {
+	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 }
 
 /* 注册 */
@@ -56,7 +70,7 @@ func (server *Server) registerHandle(ctx *gin.Context) {
 	}
 
 	/* 创建用户 */
-	hashedPassword, err := util.HashPassword(req.Password) // 对密码加密
+	hashedPassword, err := hashPassword(req.Password) // 对密码加密
 	if err != nil {
 		log.Error().Err(err).Msg("注册失败")
 		ctx.JSON(http.StatusInternalServerError, wrapResponse(false, "注册失败", nil))
@@ -120,7 +134,7 @@ func (server *Server) loginHandle(ctx *gin.Context) {
 	}
 
 	/* 校验密码 */
-	err = util.CheckPassword(req.Password, user.Password)
+	err = checkPassword(req.Password, user.Password)
 	if err != nil {
 		log.Info().Err(err).Msg("密码错误")
 		ctx.JSON(http.StatusUnauthorized, wrapResponse(false, "密码错误", nil))
@@ -149,7 +163,7 @@ type updateInfoRequest struct {
 }
 
 func (server *Server) updateInfoHandle(ctx *gin.Context) {
-	tokenPayload := ctx.MustGet("token_payload").(*util.TokenPayload)
+	tokenPayload := ctx.MustGet("token_payload").(*TokenPayload)
 
 	var req updateInfoRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -170,7 +184,7 @@ func (server *Server) updateInfoHandle(ctx *gin.Context) {
 		user.Nickname = req.Nickname
 	}
 	if req.Password != "" {
-		hashedPassword, err := util.HashPassword(req.Password)
+		hashedPassword, err := hashPassword(req.Password)
 		if err != nil {
 			log.Error().Err(err).Msg("修改失败")
 			ctx.JSON(http.StatusInternalServerError, wrapResponse(false, "修改失败", nil))

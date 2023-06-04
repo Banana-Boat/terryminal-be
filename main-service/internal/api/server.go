@@ -5,26 +5,35 @@ import (
 
 	"github.com/Banana-Boat/terryminal/main-service/internal/db"
 	"github.com/Banana-Boat/terryminal/main-service/internal/util"
+	"github.com/Banana-Boat/terryminal/main-service/internal/worker"
 	"github.com/gin-gonic/gin"
+	"github.com/hibiken/asynq"
 )
 
 type Server struct {
-	config     util.Config
-	store      *db.Store
-	tokenMaker *util.TokenMaker
-	router     *gin.Engine
+	config          util.Config
+	store           *db.Store
+	tokenMaker      *TokenMaker
+	taskDistributor *worker.TaskDistributor
+	router          *gin.Engine
 }
 
 func NewServer(config util.Config, store *db.Store) (*Server, error) {
-	tokenMaker, err := util.NewTokenMaker(config.TokenSymmetricKey)
+	tokenMaker, err := NewTokenMaker(config.TokenSymmetricKey)
 	if err != nil {
 		return nil, err
 	}
 
+	redisOpt := asynq.RedisClientOpt{
+		Addr: fmt.Sprintf("%s:%s", config.RedisHost, config.RedisPort),
+	}
+	taskDistributor := worker.NewTaskDistributor(redisOpt)
+
 	server := &Server{
-		config:     config,
-		store:      store,
-		tokenMaker: tokenMaker,
+		config:          config,
+		store:           store,
+		tokenMaker:      tokenMaker,
+		taskDistributor: taskDistributor,
 	}
 
 	server.setupRouter()

@@ -5,13 +5,12 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/Banana-Boat/terryminal/main-service/internal/util"
 	"github.com/gin-gonic/gin"
 )
 
 var err = errors.New("invalid authorization header format")
 
-func authMiddleware(tokenMaker *util.TokenMaker) gin.HandlerFunc {
+func authMiddleware(tokenMaker *TokenMaker) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		authHeader := ctx.GetHeader("authorization")
 
