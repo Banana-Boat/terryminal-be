@@ -4,6 +4,8 @@ CREATE TABLE IF NOT EXISTS `users` (
   `nickname` VARCHAR(64) NOT NULL,
   `password` VARCHAR(64) NOT NULL,
   `chatbot_token` INT NOT NULL DEFAULT 1000,
+  `verification_code` VARCHAR(64),
+  `expired_at` DATETIME,
   `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)

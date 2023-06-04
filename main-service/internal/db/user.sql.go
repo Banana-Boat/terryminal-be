@@ -30,7 +30,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (sql.Res
 }
 
 const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT id, email, nickname, password, chatbot_token, created_at, updated_at FROM users
+SELECT id, email, nickname, password, chatbot_token, verification_code, expired_at, created_at, updated_at FROM users
 WHERE email = ? LIMIT 1
 `
 
@@ -43,6 +43,8 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 		&i.Nickname,
 		&i.Password,
 		&i.ChatbotToken,
+		&i.VerificationCode,
+		&i.ExpiredAt,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -50,7 +52,7 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 }
 
 const getUserById = `-- name: GetUserById :one
-SELECT id, email, nickname, password, chatbot_token, created_at, updated_at FROM users
+SELECT id, email, nickname, password, chatbot_token, verification_code, expired_at, created_at, updated_at FROM users
 WHERE id = ? LIMIT 1
 `
 
@@ -63,6 +65,8 @@ func (q *Queries) GetUserById(ctx context.Context, id int64) (User, error) {
 		&i.Nickname,
 		&i.Password,
 		&i.ChatbotToken,
+		&i.VerificationCode,
+		&i.ExpiredAt,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -102,6 +106,29 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) error {
 		arg.Password,
 		arg.Nickname,
 		arg.ChatbotToken,
+		arg.UpdatedAt,
+		arg.ID,
+	)
+	return err
+}
+
+const updateVerificationCode = `-- name: UpdateVerificationCode :exec
+UPDATE users
+SET verification_code = ?, expired_at = ?, updated_at = ?
+WHERE id = ?
+`
+
+type UpdateVerificationCodeParams struct {
+	VerificationCode sql.NullString `json:"verificationCode"`
+	ExpiredAt        sql.NullTime   `json:"expiredAt"`
+	UpdatedAt        time.Time      `json:"updatedAt"`
+	ID               int64          `json:"id"`
+}
+
+func (q *Queries) UpdateVerificationCode(ctx context.Context, arg UpdateVerificationCodeParams) error {
+	_, err := q.db.ExecContext(ctx, updateVerificationCode,
+		arg.VerificationCode,
+		arg.ExpiredAt,
 		arg.UpdatedAt,
 		arg.ID,
 	)

@@ -32,11 +32,13 @@ type TerminalTemplate struct {
 }
 
 type User struct {
-	ID           int64     `json:"id"`
-	Email        string    `json:"email"`
-	Nickname     string    `json:"nickname"`
-	Password     string    `json:"password"`
-	ChatbotToken int32     `json:"chatbotToken"`
-	CreatedAt    time.Time `json:"createdAt"`
-	UpdatedAt    time.Time `json:"updatedAt"`
+	ID               int64          `json:"id"`
+	Email            string         `json:"email"`
+	Nickname         string         `json:"nickname"`
+	Password         string         `json:"password"`
+	ChatbotToken     int32          `json:"chatbotToken"`
+	VerificationCode sql.NullString `json:"verificationCode"`
+	ExpiredAt        sql.NullTime   `json:"expiredAt"`
+	CreatedAt        time.Time      `json:"createdAt"`
+	UpdatedAt        time.Time      `json:"updatedAt"`
 }

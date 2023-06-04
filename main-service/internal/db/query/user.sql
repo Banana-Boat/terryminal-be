@@ -23,3 +23,8 @@ WHERE email = ? LIMIT 1;
 UPDATE users 
 SET password = ?, nickname = ?, chatbot_token = ?, updated_at = ?
 WHERE id = ?;
+
+-- name: UpdateVerificationCode :exec
+UPDATE users
+SET verification_code = ?, expired_at = ?, updated_at = ?
+WHERE id = ?;

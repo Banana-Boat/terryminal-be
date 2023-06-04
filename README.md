@@ -45,6 +45,8 @@ erDiagram
         string nickname "昵称"
         string password "密码"
         int chatbot_token "Chatbot服务剩余Token数"
+        string verification_code "验证码"
+        datetime expired_at "验证码过期时间"
         datetime created_at
         datetime updated_at
     }
@@ -68,6 +70,8 @@ erDiagram
         datetime created_at
         datetime updated_at
     }
+
+
 ```
 
 ## 主要依赖
