@@ -18,7 +18,7 @@ import (
 )
 
 /* 向前端返回去除敏感信息的用户信息 */
-type userOfResponse struct {
+type userOfResp struct {
 	ID           int64     `json:"id"`
 	Email        string    `json:"email"`
 	Nickname     string    `json:"nickname"`
@@ -27,8 +27,8 @@ type userOfResponse struct {
 	UpdatedAt    time.Time `json:"updatedAt"`
 }
 
-func newUserOfResponse(user db.User) userOfResponse {
-	return userOfResponse{
+func newUserOfResp(user db.User) userOfResp {
+	return userOfResp{
 		ID:           user.ID,
 		Email:        user.Email,
 		Nickname:     user.Nickname,
@@ -52,14 +52,14 @@ func checkPassword(password string, hashedPassword string) error {
 }
 
 /* 注册 */
-type registerRequest struct {
+type registerReq struct {
 	Email    string `json:"email" binding:"required"`
 	Nickname string `json:"nickname" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
 
-func (server *Server) registerHandle(ctx *gin.Context) {
-	var req registerRequest
+func (server *Server) handleRegister(ctx *gin.Context) {
+	var req registerReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		log.Info().Err(err).Msg("invalid request body")
 		ctx.JSON(http.StatusBadRequest, wrapResponse(false, "参数不合法", nil))
@@ -105,17 +105,17 @@ func (server *Server) registerHandle(ctx *gin.Context) {
 
 	/* 返回结果 */
 	log.Info().Msg("register success")
-	ctx.JSON(http.StatusOK, wrapResponse(true, "", gin.H{"user": newUserOfResponse(user)}))
+	ctx.JSON(http.StatusOK, wrapResponse(true, "", gin.H{"user": newUserOfResp(user)}))
 }
 
 /* 登录 */
-type loginRequest struct {
+type loginReq struct {
 	Email    string `json:"email" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
 
-func (server *Server) loginHandle(ctx *gin.Context) {
-	var req loginRequest
+func (server *Server) handleLogin(ctx *gin.Context) {
+	var req loginReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		log.Info().Err(err).Msg("invalid request body")
 		ctx.JSON(http.StatusBadRequest, wrapResponse(false, "参数不合法", nil))
@@ -157,12 +157,12 @@ func (server *Server) loginHandle(ctx *gin.Context) {
 	log.Info().Msg("login success")
 	ctx.JSON(http.StatusOK, wrapResponse(true, "", gin.H{
 		"token": token,
-		"user":  newUserOfResponse(user),
+		"user":  newUserOfResp(user),
 	}))
 }
 
 /* 发送邮箱验证码 */
-func (server *Server) sendCodeByEmailHandle(ctx *gin.Context) {
+func (server *Server) handleSendCodeByEmail(ctx *gin.Context) {
 	email := ctx.Query("email")
 	if email == "" {
 		log.Info().Msg("invalid params")
@@ -222,14 +222,14 @@ func (server *Server) sendCodeByEmailHandle(ctx *gin.Context) {
 }
 
 /* 修改用户密码 */
-type updatePasswordRequest struct {
+type updateUserPwdReq struct {
 	Email    string `json:"email" binding:"required"`
 	Password string `json:"password" binding:"required"`
 	Code     string `json:"code" binding:"required"`
 }
 
-func (server *Server) updatePasswordHandle(ctx *gin.Context) {
-	var req updatePasswordRequest
+func (server *Server) handleUpdateUserPwd(ctx *gin.Context) {
+	var req updateUserPwdReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		log.Info().Err(err).Msg("invalid request body")
 		ctx.JSON(http.StatusBadRequest, wrapResponse(false, "参数不合法", nil))
@@ -283,15 +283,15 @@ func (server *Server) updatePasswordHandle(ctx *gin.Context) {
 }
 
 /* 修改用户信息 */
-type updateInfoRequest struct {
+type updateUserInfoReq struct {
 	Nickname string `json:"nickname"`
 	Password string `json:"password"`
 }
 
-func (server *Server) updateInfoHandle(ctx *gin.Context) {
+func (server *Server) handleUpdateUserInfo(ctx *gin.Context) {
 	tokenPayload := ctx.MustGet("token_payload").(*TokenPayload)
 
-	var req updateInfoRequest
+	var req updateUserInfoReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		log.Info().Err(err).Msg("invalid request body")
 		ctx.JSON(http.StatusBadRequest, wrapResponse(false, "参数不合法", nil))
@@ -343,7 +343,7 @@ func (server *Server) updateInfoHandle(ctx *gin.Context) {
 
 	log.Info().Msg("update success")
 	ctx.JSON(http.StatusOK, wrapResponse(true, "", gin.H{
-		"user": newUserOfResponse(_user),
+		"user": newUserOfResp(_user),
 	}))
 }
 

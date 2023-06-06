@@ -54,16 +54,23 @@ func (server *Server) Start() error {
 func (server *Server) setupRouter() {
 	router := gin.Default()
 
-	router.POST("/user/login", server.loginHandle)
-	router.POST("/user/register", server.registerHandle)
-	router.GET("/user/sendCodeByEmail", server.sendCodeByEmailHandle)
-	router.PATCH("/user/updatePassword", server.updatePasswordHandle)
+	router.POST("/user/login", server.handleLogin)
+	router.POST("/user/register", server.handleRegister)
+	router.GET("/user/sendCodeByEmail", server.handleSendCodeByEmail)
+	router.PATCH("/user/updatePassword", server.handleUpdateUserPwd)
 
 	authRouter := router.Group("/").Use(authMiddleware(server.tokenMaker))
-	authRouter.PATCH("/user/updateInfo", server.updateInfoHandle)
 
-	router.POST("/chatbot/chat", server.chatHandle)
-	router.GET("/terminal/ws", server.terminalWSHandle)
+	authRouter.PATCH("/user/updateInfo", server.handleUpdateUserInfo)
+
+	authRouter.GET("/terminal/ws", server.handleTermWS)
+	authRouter.GET("/terminal/create", server.handleCreateTerm)
+	authRouter.DELETE("/terminal/destroy", server.handleDestroyTerm)
+	authRouter.GET("/terminal/getTemplates", server.handleGetTermTemplates)
+	authRouter.GET("/terminal/getUserTerminlas", server.handleGetUserTerms)
+	authRouter.PATCH("/terminal/updateInfo", server.handleUpdateTermInfo)
+
+	authRouter.POST("/chatbot/chat", server.handleChat)
 
 	server.router = router
 }

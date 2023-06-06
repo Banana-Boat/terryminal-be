@@ -53,7 +53,7 @@ erDiagram
     TERMINAL {
         int id PK
         string name UK "实例名称（同Docker容器名）"
-        decimal size "Docker容器体积"
+        string size "Docker容器体积"
         string remark "用户备注"
         int owner_id FK "所有者ID"
         int template_id FK "模版ID"
@@ -65,7 +65,7 @@ erDiagram
         int id PK
         string name UK "模版名称"
         string image_name "Docker镜像名"
-        decimal size "Docker镜像体积"
+        string size "Docker镜像体积"
         string description "模版描述"
         datetime created_at
         datetime updated_at

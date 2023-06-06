@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"net"
+	"net/http"
 
 	"github.com/Banana-Boat/terryminal/main-service/internal/pb"
 	"github.com/Banana-Boat/terryminal/main-service/internal/pty"
@@ -22,15 +23,16 @@ type PtyHandler struct {
 	gRPCStream pb.BasePty_RunCmdClient // gRPC数据流
 }
 
-// 单个socket连接的上下文
+// socket连接上下文
 type WSContext struct {
 	conn          net.Conn
 	config        util.Config
 	PtyHandlerMap map[string]*PtyHandler
 }
 
-func (server *Server) terminalWSHandle(c *gin.Context) {
-	conn, _, _, err := ws.UpgradeHTTP(c.Request, c.Writer)
+/* Websocket连接 */
+func (server *Server) handleTermWS(ctx *gin.Context) {
+	conn, _, _, err := ws.UpgradeHTTP(ctx.Request, ctx.Writer)
 	if err != nil {
 		log.Error().Err(err).Msg("cannot upgrade http to websocket")
 		return
@@ -83,4 +85,45 @@ func routeByEvent(wsCtx *WSContext, wsMsg Message) {
 
 		runCmdEventHandle(wsCtx, wsMsg.PtyID, data.Cmd)
 	}
+}
+
+/* 创建终端实例 */
+func (server *Server) handleCreateTerm(ctx *gin.Context) {
+	templateId := ctx.Query("templateId")
+	if templateId == "" {
+		log.Info().Msg("invalid params")
+		ctx.JSON(http.StatusBadRequest, wrapResponse(false, "参数不合法", nil))
+		return
+	}
+
+}
+
+/* 销毁终端实例 */
+func (server *Server) handleDestroyTerm(ctx *gin.Context) {
+	terminalId := ctx.Query("terminalId")
+	if terminalId == "" {
+		log.Info().Msg("invalid params")
+		ctx.JSON(http.StatusBadRequest, wrapResponse(false, "参数不合法", nil))
+		return
+	}
+}
+
+/* 获取终端模版列表 */
+func (server *Server) handleGetTermTemplates(ctx *gin.Context) {
+
+}
+
+/* 获取某个用户的终端实例列表 */
+func (server *Server) handleGetUserTerms(ctx *gin.Context) {
+
+}
+
+/* 修改终端实例信息 */
+type updateTermInfoReq struct {
+	terminalId string `json:"terminalId" binding:"required"`
+	remark     string `json:"remark"`
+}
+
+func (server *Server) handleUpdateTermInfo(ctx *gin.Context) {
+
 }

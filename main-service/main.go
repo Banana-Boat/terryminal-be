@@ -30,24 +30,6 @@ func main() {
 		return
 	}
 
-	/* 运行 TaskProcessor */
-	go runTaskProcessor(config)
-
-	/* 运行 http 服务 */
-	runHttpServer(config)
-}
-
-func runTaskProcessor(config util.Config) {
-
-	taskProcessor := worker.NewTaskProcessor(config)
-
-	log.Info().Msgf("task processor is running at %s:%s", config.RedisHost, config.RedisPort)
-	if err := taskProcessor.Start(); err != nil {
-		log.Fatal().Err(err).Msg("failed to start task processor")
-	}
-}
-
-func runHttpServer(config util.Config) {
 	/* 执行DB migration */
 	migration, err := migrate.New(
 		config.MigrationFileUrl,
@@ -75,6 +57,30 @@ func runHttpServer(config util.Config) {
 	store := db.NewStore(conn)
 	log.Info().Msg("db connected successfully")
 
+	/* 初始化终端模版字典表 */
+	if err = util.InitTermTemplates(store); err != nil {
+		log.Error().Err(err).Msg("failed to init terminal templates")
+		return
+	}
+
+	/* 运行 TaskProcessor */
+	go runTaskProcessor(config)
+
+	/* 运行 http 服务 */
+	runHttpServer(config, store)
+}
+
+func runTaskProcessor(config util.Config) {
+
+	taskProcessor := worker.NewTaskProcessor(config)
+
+	log.Info().Msgf("task processor is running at %s:%s", config.RedisHost, config.RedisPort)
+	if err := taskProcessor.Start(); err != nil {
+		log.Fatal().Err(err).Msg("failed to start task processor")
+	}
+}
+
+func runHttpServer(config util.Config, store *db.Store) {
 	/* 创建并启动Server */
 	server, err := api.NewServer(config, store)
 	if err != nil {
