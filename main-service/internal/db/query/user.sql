@@ -19,7 +19,7 @@ WHERE id = ? LIMIT 1;
 SELECT * FROM users
 WHERE email = ? LIMIT 1;
 
--- name: UpdateUser :exec
+-- name: UpdateUserInfo :exec
 UPDATE users 
 SET password = ?, nickname = ?, chatbot_token = ?, updated_at = ?
 WHERE id = ?;
@@ -27,4 +27,4 @@ WHERE id = ?;
 -- name: UpdateVerificationCode :exec
 UPDATE users
 SET verification_code = ?, expired_at = ?, updated_at = ?
-WHERE id = ?;
+WHERE email = ?;

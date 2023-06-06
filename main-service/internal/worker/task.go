@@ -1,8 +1,11 @@
 package worker
 
+/* 邮件发送 */
 const TaskSendMail = "task:send_mail"
 
 type PayloadSendMail struct {
-	DestAddr string `json:"destAddr"`
-	Content  string `json:"content"`
+	To      string `json:"to"`
+	Subject string `json:"subject"`
+	Html    string `json:"html"`
+	Text    string `json:"text"`
 }

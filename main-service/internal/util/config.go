@@ -30,6 +30,11 @@ type Config struct {
 	BasePtyPort      string `mapstructure:"BASE_PTY_PORT"`
 	BasePtyImageName string `mapstructure:"BASE_PTY_IMAGE_NAME"`
 	BasePtyNetwork   string `mapstructure:"BASE_PTY_NETWORK"`
+
+	SmtpHost      string `mapstructure:"SMTP_HOST"`
+	SmtpPort      string `mapstructure:"SMTP_PORT"`
+	EmailAuthCode string `mapstructure:"EMAIL_AUTH_CODE"`
+	EmailFromAddr string `mapstructure:"EMAIL_FROM_ADDR"`
 }
 
 func LoadConfig(path string) (config Config, err error) {

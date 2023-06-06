@@ -87,13 +87,13 @@ func (q *Queries) IsUserExisted(ctx context.Context, email string) (bool, error)
 	return exists, err
 }
 
-const updateUser = `-- name: UpdateUser :exec
+const updateUserInfo = `-- name: UpdateUserInfo :exec
 UPDATE users 
 SET password = ?, nickname = ?, chatbot_token = ?, updated_at = ?
 WHERE id = ?
 `
 
-type UpdateUserParams struct {
+type UpdateUserInfoParams struct {
 	Password     string    `json:"password"`
 	Nickname     string    `json:"nickname"`
 	ChatbotToken int32     `json:"chatbotToken"`
@@ -101,8 +101,8 @@ type UpdateUserParams struct {
 	ID           int64     `json:"id"`
 }
 
-func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) error {
-	_, err := q.db.ExecContext(ctx, updateUser,
+func (q *Queries) UpdateUserInfo(ctx context.Context, arg UpdateUserInfoParams) error {
+	_, err := q.db.ExecContext(ctx, updateUserInfo,
 		arg.Password,
 		arg.Nickname,
 		arg.ChatbotToken,
@@ -115,14 +115,14 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) error {
 const updateVerificationCode = `-- name: UpdateVerificationCode :exec
 UPDATE users
 SET verification_code = ?, expired_at = ?, updated_at = ?
-WHERE id = ?
+WHERE email = ?
 `
 
 type UpdateVerificationCodeParams struct {
 	VerificationCode sql.NullString `json:"verificationCode"`
 	ExpiredAt        sql.NullTime   `json:"expiredAt"`
 	UpdatedAt        time.Time      `json:"updatedAt"`
-	ID               int64          `json:"id"`
+	Email            string         `json:"email"`
 }
 
 func (q *Queries) UpdateVerificationCode(ctx context.Context, arg UpdateVerificationCodeParams) error {
@@ -130,7 +130,7 @@ func (q *Queries) UpdateVerificationCode(ctx context.Context, arg UpdateVerifica
 		arg.VerificationCode,
 		arg.ExpiredAt,
 		arg.UpdatedAt,
-		arg.ID,
+		arg.Email,
 	)
 	return err
 }

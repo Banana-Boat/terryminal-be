@@ -2,7 +2,6 @@ package worker
 
 import (
 	"context"
-	"encoding/json"
 
 	"github.com/hibiken/asynq"
 	"github.com/rs/zerolog/log"
@@ -19,24 +18,19 @@ func NewTaskDistributor(redisOpt asynq.RedisClientOpt) *TaskDistributor {
 	}
 }
 
-/* 发布SendMail任务 */
-func (distributor *TaskDistributor) DistributeTaskSendMail(
+/* 发布任务 */
+func (distributor *TaskDistributor) DistributeTask(
 	ctx context.Context,
-	payload *PayloadSendMail,
+	typeName string,
+	payload []byte,
 	opts ...asynq.Option,
 ) error {
-	_payload, err := json.Marshal(payload)
+	task := asynq.NewTask(typeName, payload, opts...)
+	taskInfo, err := distributor.client.EnqueueContext(ctx, task)
 	if err != nil {
 		return err
 	}
 
-	task := asynq.NewTask(TaskSendMail, _payload, opts...)
-	_, err = distributor.client.EnqueueContext(ctx, task)
-	if err != nil {
-		return err
-	}
-
-	log.Info().Msg("task enqueued")
-
+	log.Info().Msgf("task enqueued: id=%s type=%s", taskInfo.ID, task.Type())
 	return nil
 }

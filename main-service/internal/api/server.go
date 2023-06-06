@@ -56,6 +56,8 @@ func (server *Server) setupRouter() {
 
 	router.POST("/user/login", server.loginHandle)
 	router.POST("/user/register", server.registerHandle)
+	router.GET("/user/sendCodeByEmail", server.sendCodeByEmailHandle)
+	router.PATCH("/user/updatePassword", server.updatePasswordHandle)
 
 	authRouter := router.Group("/").Use(authMiddleware(server.tokenMaker))
 	authRouter.PATCH("/user/updateInfo", server.updateInfoHandle)
