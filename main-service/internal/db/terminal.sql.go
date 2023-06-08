@@ -49,6 +49,28 @@ func (q *Queries) DeleteTerminal(ctx context.Context, id int64) error {
 	return err
 }
 
+const getTerminalById = `-- name: GetTerminalById :one
+SELECT id, name, size, remark, owner_id, template_id, total_duration, created_at, updated_at FROM terminals
+WHERE id = ? LIMIT 1
+`
+
+func (q *Queries) GetTerminalById(ctx context.Context, id int64) (Terminal, error) {
+	row := q.db.QueryRowContext(ctx, getTerminalById, id)
+	var i Terminal
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Size,
+		&i.Remark,
+		&i.OwnerID,
+		&i.TemplateID,
+		&i.TotalDuration,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const getTerminalByOwnId = `-- name: GetTerminalByOwnId :many
 SELECT id, name, size, remark, owner_id, template_id, total_duration, created_at, updated_at FROM terminals
 WHERE owner_id = ?

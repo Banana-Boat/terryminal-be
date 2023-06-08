@@ -14,6 +14,10 @@ WHERE id = ?;
 DELETE FROM terminals
 WHERE id = ?;
 
+-- name: GetTerminalById :one
+SELECT * FROM terminals
+WHERE id = ? LIMIT 1;
+
 -- name: GetTerminalByOwnId :many
 SELECT * FROM terminals
 WHERE owner_id = ?;

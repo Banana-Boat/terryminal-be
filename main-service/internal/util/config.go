@@ -29,7 +29,7 @@ type Config struct {
 	BasePtyHost      string `mapstructure:"BASE_PTY_HOST"`
 	BasePtyPort      string `mapstructure:"BASE_PTY_PORT"`
 	BasePtyImageName string `mapstructure:"BASE_PTY_IMAGE_NAME"`
-	BasePtyNetwork   string `mapstructure:"BASE_PTY_NETWORK"`
+	PtyNetwork       string `mapstructure:"PTY_NETWORK"`
 
 	SmtpHost      string `mapstructure:"SMTP_HOST"`
 	SmtpPort      string `mapstructure:"SMTP_PORT"`

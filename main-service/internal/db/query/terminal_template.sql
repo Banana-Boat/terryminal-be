@@ -7,3 +7,7 @@ INSERT INTO terminal_templates (
 
 -- name: GetTerminalTemplates :many
 SELECT * FROM terminal_templates;
+
+-- name: GetTerminalTemplateById :one
+SELECT * FROM terminal_templates
+WHERE id = ? LIMIT 1;

@@ -64,7 +64,7 @@ func (server *Server) setupRouter() {
 	authRouter.PATCH("/user/updateInfo", server.handleUpdateUserInfo)
 
 	authRouter.GET("/terminal/ws", server.handleTermWS)
-	authRouter.GET("/terminal/create", server.handleCreateTerm)
+	authRouter.POST("/terminal/create", server.handleCreateTerm)
 	authRouter.DELETE("/terminal/destroy", server.handleDestroyTerm)
 	authRouter.GET("/terminal/getTemplates", server.handleGetTermTemplates)
 	authRouter.GET("/terminal/getUserTerminlas", server.handleGetUserTerms)

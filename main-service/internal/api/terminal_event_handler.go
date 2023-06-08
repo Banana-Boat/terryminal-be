@@ -16,7 +16,7 @@ import (
 func startEventHandle(wsCtx *WSContext, ptyID string, config util.Config) {
 	/* 创建容器并启动 */
 	basePtyContainer, err := pty.NewPty(
-		config.BasePtyImageName, ptyID, config.BasePtyNetwork, nil,
+		config.BasePtyImageName, ptyID, config.PtyNetwork, nil,
 	)
 	if err != nil {
 		log.Error().Err(err).Msg("failed to create pty container")

@@ -34,6 +34,26 @@ func (q *Queries) CreateTerminalTemplate(ctx context.Context, arg CreateTerminal
 	)
 }
 
+const getTerminalTemplateById = `-- name: GetTerminalTemplateById :one
+SELECT id, name, image_name, size, description, created_at, updated_at FROM terminal_templates
+WHERE id = ? LIMIT 1
+`
+
+func (q *Queries) GetTerminalTemplateById(ctx context.Context, id int64) (TerminalTemplate, error) {
+	row := q.db.QueryRowContext(ctx, getTerminalTemplateById, id)
+	var i TerminalTemplate
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.ImageName,
+		&i.Size,
+		&i.Description,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const getTerminalTemplates = `-- name: GetTerminalTemplates :many
 SELECT id, name, image_name, size, description, created_at, updated_at FROM terminal_templates
 `
