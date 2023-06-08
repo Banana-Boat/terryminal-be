@@ -15,7 +15,7 @@ import (
 
 func startEventHandle(wsCtx *WSContext, ptyID string, config util.Config) {
 	/* 创建容器并启动 */
-	basePtyContainer, err := pty.NewPtyContainer(
+	basePtyContainer, err := pty.NewPty(
 		config.BasePtyImageName, ptyID, config.BasePtyNetwork, nil,
 	)
 	if err != nil {

@@ -17,7 +17,7 @@ import (
 )
 
 type PtyHandler struct {
-	container  *pty.PtyContainer       // pty Docker容器
+	container  *pty.Pty                // pty Docker容器
 	gRPCConn   *grpc.ClientConn        // gRPC连接
 	gRPCClient pb.BasePtyClient        // gRPC客户端
 	gRPCStream pb.BasePty_RunCmdClient // gRPC数据流

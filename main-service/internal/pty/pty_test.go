@@ -28,7 +28,7 @@ func TestCreateBash(t *testing.T) {
 
 	/* 容器创建并启动 */
 	containerName := fmt.Sprint(time.Now().Unix())
-	bashContainer, err := NewPtyContainer(
+	bashContainer, err := NewPty(
 		config.BasePtyImageName, containerName, "",
 		&PtyPortMap{
 			HostPort:      config.BasePtyPort,
@@ -90,4 +90,12 @@ func TestCreateBash(t *testing.T) {
 	if err = bashContainer.Remove(); err != nil {
 		t.Error(err)
 	}
+}
+
+func TestIsPtyExist(t *testing.T) {
+	// github action 不执行该测试
+	if testing.Short() {
+		t.Skip("Skipping test in github action.")
+	}
+
 }
