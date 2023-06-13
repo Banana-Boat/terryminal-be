@@ -34,10 +34,6 @@ else
 	docker run --name terryminal-mysql --network terryminal  -p 3306:3306 -e MYSQL_ROOT_PASSWORD=${DB_PASSWORD} -e MYSQL_DATABASE=${DB_NAME} -d mysql:8.0
 endif
 
-.PHONY: migrate_init
-migrate_init:	## 生成migrate模版文件
-	rm -rf ./internal/db/migration/** && migrate create -ext sql -dir ./internal/db/migration -seq init_schema
-
 .PHONY: sqlc
 sqlc: ## 根据sql文件生成go代码
 	sqlc generate

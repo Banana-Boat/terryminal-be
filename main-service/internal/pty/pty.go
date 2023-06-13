@@ -99,7 +99,7 @@ func GetPty(containerName string) (*Pty, error) {
 	defer cli.Close()
 
 	/* 判断容器是否存在 */
-	containers, err := cli.ContainerList(context.Background(), types.ContainerListOptions{})
+	containers, err := cli.ContainerList(context.Background(), types.ContainerListOptions{All: true})
 	if err != nil {
 		return nil, err
 	}
@@ -115,7 +115,7 @@ func GetPty(containerName string) (*Pty, error) {
 		}
 	}
 
-	return nil, nil
+	return nil, fmt.Errorf("container %s not exist", containerName)
 }
 
 /* 启动容器 */

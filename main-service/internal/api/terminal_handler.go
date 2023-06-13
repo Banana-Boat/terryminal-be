@@ -1,7 +1,6 @@
 package api
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net"
@@ -94,8 +93,8 @@ func routeByEvent(wsCtx *WSContext, wsMsg Message) {
 
 /* 创建终端实例 */
 type createTermReq struct {
-	TerminalId int64  `json:"terminalId" binding:"required"`
-	Remark     string `json:"remark"`
+	TemplateId int64  `json:"templateId" binding:"required"`
+	Remark     string `json:"remark" binding:"omitempty"`
 }
 
 func (server *Server) handleCreateTerm(ctx *gin.Context) {
@@ -110,7 +109,7 @@ func (server *Server) handleCreateTerm(ctx *gin.Context) {
 	}
 
 	/* 获得template */
-	template, err := server.store.GetTerminalTemplateById(ctx, req.TerminalId)
+	template, err := server.store.GetTerminalTemplateById(ctx, req.TemplateId)
 	if err != nil {
 		log.Error().Err(err).Msg("cannot get terminal template")
 		ctx.JSON(http.StatusInternalServerError, wrapResponse(false, "模版不存在", nil))
@@ -129,10 +128,11 @@ func (server *Server) handleCreateTerm(ctx *gin.Context) {
 
 	/* 更新数据库 */
 	args := db.CreateTerminalParams{
-		Name:    containerName,
-		Size:    template.Size,
-		Remark:  sql.NullString{String: req.Remark, Valid: true},
-		OwnerID: tokenPayload.ID,
+		Name:       containerName,
+		Size:       template.Size,
+		Remark:     req.Remark,
+		OwnerID:    tokenPayload.ID,
+		TemplateID: req.TemplateId,
 	}
 	res, err := server.store.CreateTerminal(ctx, args)
 	if err != nil {
@@ -238,7 +238,7 @@ func (server *Server) handleGetUserTerms(ctx *gin.Context) {
 /* 修改终端实例信息 */
 type updateTermInfoReq struct {
 	TerminalId int64  `json:"terminalId" binding:"required"`
-	Remark     string `json:"remark"`
+	Remark     string `json:"remark" binding:"omitempty"`
 }
 
 func (server *Server) handleUpdateTermInfo(ctx *gin.Context) {
@@ -250,10 +250,21 @@ func (server *Server) handleUpdateTermInfo(ctx *gin.Context) {
 		return
 	}
 
+	/* 获取终端实例 */
+	term, err := server.store.GetTerminalById(ctx, req.TerminalId)
+	if err != nil {
+		log.Error().Err(err).Msg("cannot get terminal")
+		ctx.JSON(http.StatusInternalServerError, wrapResponse(false, "更新失败", nil))
+		return
+	}
+
 	/* 更新数据库 */
 	args := db.UpdateTerminalInfoParams{
-		ID:     req.TerminalId,
-		Remark: sql.NullString{String: req.Remark, Valid: true},
+		ID:            req.TerminalId,
+		Size:          term.Size,
+		Remark:        req.Remark,
+		TotalDuration: term.TotalDuration,
+		UpdatedAt:     time.Now(),
 	}
 	if err := server.store.UpdateTerminalInfo(ctx, args); err != nil {
 		log.Error().Err(err).Msg("cannot update terminal")
@@ -262,7 +273,7 @@ func (server *Server) handleUpdateTermInfo(ctx *gin.Context) {
 	}
 
 	/* 查询新增终端实例 */
-	term, err := server.store.GetTerminalById(ctx, req.TerminalId)
+	term, err = server.store.GetTerminalById(ctx, req.TerminalId)
 	if err != nil {
 		log.Error().Err(err).Msg("cannot get terminal")
 		ctx.JSON(http.StatusInternalServerError, wrapResponse(false, "更新失败", nil))

@@ -19,10 +19,10 @@ INSERT INTO terminal_templates (
 `
 
 type CreateTerminalTemplateParams struct {
-	Name        string         `json:"name"`
-	ImageName   string         `json:"imageName"`
-	Size        string         `json:"size"`
-	Description sql.NullString `json:"description"`
+	Name        string `json:"name"`
+	ImageName   string `json:"imageName"`
+	Size        string `json:"size"`
+	Description string `json:"description"`
 }
 
 func (q *Queries) CreateTerminalTemplate(ctx context.Context, arg CreateTerminalTemplateParams) (sql.Result, error) {

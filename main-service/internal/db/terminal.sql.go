@@ -20,12 +20,12 @@ INSERT INTO terminals (
 `
 
 type CreateTerminalParams struct {
-	Name          string         `json:"name"`
-	Size          string         `json:"size"`
-	Remark        sql.NullString `json:"remark"`
-	OwnerID       int64          `json:"ownerID"`
-	TemplateID    int64          `json:"templateID"`
-	TotalDuration time.Time      `json:"totalDuration"`
+	Name          string `json:"name"`
+	Size          string `json:"size"`
+	Remark        string `json:"remark"`
+	OwnerID       int64  `json:"ownerID"`
+	TemplateID    int64  `json:"templateID"`
+	TotalDuration int32  `json:"totalDuration"`
 }
 
 func (q *Queries) CreateTerminal(ctx context.Context, arg CreateTerminalParams) (sql.Result, error) {
@@ -111,22 +111,20 @@ func (q *Queries) GetTerminalByOwnId(ctx context.Context, ownerID int64) ([]Term
 
 const updateTerminalInfo = `-- name: UpdateTerminalInfo :exec
 UPDATE terminals
-SET name = ?, size = ?, remark = ?, total_duration = ?, updated_at = ?
+SET size = ?, remark = ?, total_duration = ?, updated_at = ?
 WHERE id = ?
 `
 
 type UpdateTerminalInfoParams struct {
-	Name          string         `json:"name"`
-	Size          string         `json:"size"`
-	Remark        sql.NullString `json:"remark"`
-	TotalDuration time.Time      `json:"totalDuration"`
-	UpdatedAt     time.Time      `json:"updatedAt"`
-	ID            int64          `json:"id"`
+	Size          string    `json:"size"`
+	Remark        string    `json:"remark"`
+	TotalDuration int32     `json:"totalDuration"`
+	UpdatedAt     time.Time `json:"updatedAt"`
+	ID            int64     `json:"id"`
 }
 
 func (q *Queries) UpdateTerminalInfo(ctx context.Context, arg UpdateTerminalInfoParams) error {
 	_, err := q.db.ExecContext(ctx, updateTerminalInfo,
-		arg.Name,
 		arg.Size,
 		arg.Remark,
 		arg.TotalDuration,

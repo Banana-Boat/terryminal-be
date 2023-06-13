@@ -7,7 +7,7 @@ INSERT INTO terminals (
 
 -- name: UpdateTerminalInfo :exec
 UPDATE terminals
-SET name = ?, size = ?, remark = ?, total_duration = ?, updated_at = ?
+SET size = ?, remark = ?, total_duration = ?, updated_at = ?
 WHERE id = ?;
 
 -- name: DeleteTerminal :exec

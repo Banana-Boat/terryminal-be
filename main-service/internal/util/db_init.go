@@ -2,7 +2,6 @@ package util
 
 import (
 	"context"
-	"database/sql"
 
 	"github.com/Banana-Boat/terryminal/main-service/internal/db"
 )
@@ -12,7 +11,7 @@ var terminalTemplateDict = []db.TerminalTemplate{
 		Name:        "Bash",
 		Size:        "529MB",
 		ImageName:   "tiangexiang/terryminal-base-pty:0.1.0",
-		Description: sql.NullString{String: "基于Alpine Linux，仅可使用Bash", Valid: true},
+		Description: "基于Alpine Linux，仅可使用Bash",
 	},
 }
 
