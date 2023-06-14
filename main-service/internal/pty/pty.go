@@ -52,7 +52,12 @@ func NewPty(imageName string, containerName string, network string, ptyPortMap *
 
 	/* 创建docker container */
 	var hostConfig *containerTypes.HostConfig = nil
-	// 本地测试需要做端口映射
+	var networkConfig = &networkTypes.NetworkingConfig{
+		EndpointsConfig: map[string]*networkTypes.EndpointSettings{
+			network: {},
+		},
+	}
+	// 本地测试需要做端口映射，无需网络配置
 	if ptyPortMap != nil {
 		hostConfig = &containerTypes.HostConfig{
 			PortBindings: nat.PortMap{
@@ -61,17 +66,14 @@ func NewPty(imageName string, containerName string, network string, ptyPortMap *
 				}},
 			},
 		}
+		networkConfig = nil
 	}
 	resp, err := cli.ContainerCreate(ctx,
 		&containerTypes.Config{
 			Image: imageName,
 		},
 		hostConfig,
-		&networkTypes.NetworkingConfig{
-			EndpointsConfig: map[string]*networkTypes.EndpointSettings{
-				network: {},
-			},
-		}, nil, containerName)
+		networkConfig, nil, containerName)
 	if err != nil {
 		return "", err
 	}
@@ -94,7 +96,8 @@ func GetPtyName(id string) (string, error) {
 		return "", err
 	}
 
-	return container.Name, nil
+	// 容器名第一个字符为/，需要去掉
+	return container.Name[1:], nil
 }
 
 /* 启动容器 */

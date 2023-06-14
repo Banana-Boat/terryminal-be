@@ -28,7 +28,7 @@ func TestCreateBash(t *testing.T) {
 
 	/* 容器创建并启动 */
 	containerName := fmt.Sprint(time.Now().Unix())
-	bashContainer, err := NewPty(
+	ptyId, err := NewPty(
 		config.BasePtyImageName, containerName, "",
 		&PtyPortMap{
 			HostPort:      config.BasePtyPort,
@@ -38,7 +38,7 @@ func TestCreateBash(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if err = bashContainer.Start(); err != nil {
+	if err = StartPty(ptyId); err != nil {
 		t.Error(err)
 	}
 
@@ -77,25 +77,13 @@ func TestCreateBash(t *testing.T) {
 	stream.Send(&pb.RunCmdRequest{
 		Cmd: "ls",
 	})
-	time.Sleep(time.Millisecond * 1000)
-	stream.Send(&pb.RunCmdRequest{
-		Cmd: "exit",
-	})
 	<-done
 
 	/* 关闭并删除容器 */
-	if err = bashContainer.Stop(); err != nil {
+	if err = StopPty(ptyId); err != nil {
 		t.Error(err)
 	}
-	if err = bashContainer.Remove(); err != nil {
+	if err = RemovePty(ptyId); err != nil {
 		t.Error(err)
 	}
-}
-
-func TestIsPtyExist(t *testing.T) {
-	// github action 不执行该测试
-	if testing.Short() {
-		t.Skip("Skipping test in github action.")
-	}
-
 }

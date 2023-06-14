@@ -23,6 +23,11 @@ func startEventHandle(wsCtx *WSContext, ptyId string, config util.Config) {
 
 	/* 创建gRPC Client */
 	ptyName, err := pty.GetPtyName(ptyId) // 获取容器名
+	if err != nil {
+		log.Error().Err(err).Msg("failed to get pty name")
+		sendMessage(wsCtx.conn, ptyId, "start", StartServerData{Result: false})
+		return
+	}
 	gRPCConnection, err := grpc.Dial(
 		fmt.Sprintf("%s:%s", ptyName, config.BasePtyPort),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
@@ -33,10 +38,10 @@ func startEventHandle(wsCtx *WSContext, ptyId string, config util.Config) {
 		sendMessage(wsCtx.conn, ptyId, "start", StartServerData{Result: false})
 		return
 	}
-	basePtyClient := pb.NewBasePtyClient(gRPCConnection)
+	client := pb.NewBasePtyClient(gRPCConnection)
 
 	/* 调用RunCmd方法获取数据流对象，创建go routine接受数据流的数据，转发到client */
-	ptyStream, err := basePtyClient.RunCmd(context.Background())
+	ptyStream, err := client.RunCmd(context.Background())
 	if err != nil {
 		log.Error().Err(err).Msg("failed to create gRPC client")
 		sendMessage(wsCtx.conn, ptyId, "start", StartServerData{Result: false})
@@ -45,6 +50,7 @@ func startEventHandle(wsCtx *WSContext, ptyId string, config util.Config) {
 	go func() {
 		for {
 			resp, err := ptyStream.Recv()
+			fmt.Println(resp)
 			if err == io.EOF {
 				return
 			}
@@ -59,7 +65,7 @@ func startEventHandle(wsCtx *WSContext, ptyId string, config util.Config) {
 	/* 将对象存入context */
 	ptyHandler := &PtyHandler{
 		gRPCConn:   gRPCConnection,
-		gRPCClient: basePtyClient,
+		gRPCClient: client,
 		gRPCStream: ptyStream,
 	}
 	wsCtx.PtyHandlerMap[ptyId] = ptyHandler
