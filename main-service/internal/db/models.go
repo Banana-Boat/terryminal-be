@@ -10,7 +10,7 @@ import (
 )
 
 type Terminal struct {
-	ID            int64     `json:"id"`
+	ID            string    `json:"id"`
 	Name          string    `json:"name"`
 	Size          string    `json:"size"`
 	Remark        string    `json:"remark"`

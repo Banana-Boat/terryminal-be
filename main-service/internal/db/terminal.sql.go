@@ -13,13 +13,14 @@ import (
 
 const createTerminal = `-- name: CreateTerminal :execresult
 INSERT INTO terminals (
-  name, size, remark, owner_id, template_id, total_duration
+  id, name, size, remark, owner_id, template_id, total_duration
 ) VALUES (
-  ?, ?, ?, ?, ?, ?
+  ?, ?, ?, ?, ?, ?, ?
 )
 `
 
 type CreateTerminalParams struct {
+	ID            string `json:"id"`
 	Name          string `json:"name"`
 	Size          string `json:"size"`
 	Remark        string `json:"remark"`
@@ -30,6 +31,7 @@ type CreateTerminalParams struct {
 
 func (q *Queries) CreateTerminal(ctx context.Context, arg CreateTerminalParams) (sql.Result, error) {
 	return q.db.ExecContext(ctx, createTerminal,
+		arg.ID,
 		arg.Name,
 		arg.Size,
 		arg.Remark,
@@ -44,7 +46,7 @@ DELETE FROM terminals
 WHERE id = ?
 `
 
-func (q *Queries) DeleteTerminal(ctx context.Context, id int64) error {
+func (q *Queries) DeleteTerminal(ctx context.Context, id string) error {
 	_, err := q.db.ExecContext(ctx, deleteTerminal, id)
 	return err
 }
@@ -54,7 +56,7 @@ SELECT id, name, size, remark, owner_id, template_id, total_duration, created_at
 WHERE id = ? LIMIT 1
 `
 
-func (q *Queries) GetTerminalById(ctx context.Context, id int64) (Terminal, error) {
+func (q *Queries) GetTerminalById(ctx context.Context, id string) (Terminal, error) {
 	row := q.db.QueryRowContext(ctx, getTerminalById, id)
 	var i Terminal
 	err := row.Scan(
@@ -120,7 +122,7 @@ type UpdateTerminalInfoParams struct {
 	Remark        string    `json:"remark"`
 	TotalDuration int32     `json:"totalDuration"`
 	UpdatedAt     time.Time `json:"updatedAt"`
-	ID            int64     `json:"id"`
+	ID            string    `json:"id"`
 }
 
 func (q *Queries) UpdateTerminalInfo(ctx context.Context, arg UpdateTerminalInfoParams) error {

@@ -1,8 +1,8 @@
 -- name: CreateTerminal :execresult
 INSERT INTO terminals (
-  name, size, remark, owner_id, template_id, total_duration
+  id, name, size, remark, owner_id, template_id, total_duration
 ) VALUES (
-  ?, ?, ?, ?, ?, ?
+  ?, ?, ?, ?, ?, ?, ?
 );
 
 -- name: UpdateTerminalInfo :exec

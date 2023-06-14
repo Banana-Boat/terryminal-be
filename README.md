@@ -51,7 +51,7 @@ erDiagram
         datetime updated_at
     }
     TERMINAL {
-        int id PK
+        string id PK "同Docker容器ID"
         string name UK "实例名称（同Docker容器名）"
         string size "Docker容器体积"
         string remark "用户备注"

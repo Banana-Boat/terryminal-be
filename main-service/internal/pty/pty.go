@@ -13,32 +13,26 @@ import (
 	"github.com/docker/go-connections/nat"
 )
 
-type Pty struct {
-	ID            string
-	ContainerName string
-	ImageName     string
-}
-
 type PtyPortMap struct {
 	HostPort      string
 	ContainerPort string
 }
 
 /* 创建容器 */
-func NewPty(imageName string, containerName string, network string, ptyPortMap *PtyPortMap) (*Pty, error) {
+func NewPty(imageName string, containerName string, network string, ptyPortMap *PtyPortMap) (string, error) {
 	ctx := context.Background()
 
 	/* 创建docker client */
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	defer cli.Close()
 
 	/* 如果不存在docker image则拉取 */
 	images, err := cli.ImageList(ctx, types.ImageListOptions{})
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	isImageExist := false
 	for _, image := range images {
@@ -50,7 +44,7 @@ func NewPty(imageName string, containerName string, network string, ptyPortMap *
 	if !isImageExist {
 		out, err := cli.ImagePull(ctx, imageName, types.ImagePullOptions{})
 		if err != nil {
-			return nil, err
+			return "", err
 		}
 		defer out.Close()
 		io.Copy(os.Stdout, out) // 必须输出否则报错，待查明！！
@@ -79,47 +73,32 @@ func NewPty(imageName string, containerName string, network string, ptyPortMap *
 			},
 		}, nil, containerName)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
-	return &Pty{
-		ID:            resp.ID,
-		ContainerName: containerName,
-		ImageName:     imageName,
-	}, nil
+	return resp.ID, nil
 }
 
-/* 获取Pty对象，若容器不存在则返回nil */
-func GetPty(containerName string) (*Pty, error) {
+/* 根据容器Id获取容器名 */
+func GetPtyName(id string) (string, error) {
 	/* 创建docker client */
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	defer cli.Close()
 
-	/* 判断容器是否存在 */
-	containers, err := cli.ContainerList(context.Background(), types.ContainerListOptions{All: true})
+	/* 获取容器信息 */
+	container, err := cli.ContainerInspect(context.Background(), id)
 	if err != nil {
-		return nil, err
-	}
-	for _, container := range containers {
-		for _, name := range container.Names {
-			if name == fmt.Sprintf("/%s", containerName) {
-				return &Pty{
-					ID:            container.ID,
-					ContainerName: containerName,
-					ImageName:     container.Image,
-				}, nil
-			}
-		}
+		return "", err
 	}
 
-	return nil, fmt.Errorf("container %s not exist", containerName)
+	return container.Name, nil
 }
 
 /* 启动容器 */
-func (ptyContainer *Pty) Start() error {
+func StartPty(id string) error {
 	/* 创建docker client */
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
@@ -130,7 +109,7 @@ func (ptyContainer *Pty) Start() error {
 	// /* 启动容器 */
 	if err := cli.ContainerStart(
 		context.Background(),
-		ptyContainer.ID,
+		id,
 		types.ContainerStartOptions{},
 	); err != nil {
 		return err
@@ -140,7 +119,7 @@ func (ptyContainer *Pty) Start() error {
 }
 
 /* 停止容器 */
-func (ptyContainer *Pty) Stop() error {
+func StopPty(id string) error {
 	/* 创建docker client */
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
@@ -151,7 +130,7 @@ func (ptyContainer *Pty) Stop() error {
 	/* 停止容器 */
 	if err := cli.ContainerStop(
 		context.Background(),
-		ptyContainer.ID,
+		id,
 		containerTypes.StopOptions{},
 	); err != nil {
 		return err
@@ -161,7 +140,7 @@ func (ptyContainer *Pty) Stop() error {
 }
 
 /* 销毁容器 */
-func (ptyContainer *Pty) Remove() error {
+func RemovePty(id string) error {
 	/* 创建docker client */
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
@@ -172,7 +151,7 @@ func (ptyContainer *Pty) Remove() error {
 	/* 删除容器 */
 	if err := cli.ContainerRemove(
 		context.Background(),
-		ptyContainer.ID,
+		id,
 		types.ContainerRemoveOptions{},
 	); err != nil {
 		return err

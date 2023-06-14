@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/Banana-Boat/terryminal/main-service/internal/db"
@@ -21,7 +20,6 @@ import (
 )
 
 type PtyHandler struct {
-	container  *pty.Pty                // pty Docker容器
 	gRPCConn   *grpc.ClientConn        // gRPC连接
 	gRPCClient pb.BasePtyClient        // gRPC客户端
 	gRPCStream pb.BasePty_RunCmdClient // gRPC数据流
@@ -53,7 +51,7 @@ func (server *Server) handleTermWS(ctx *gin.Context) {
 		msg, _, err := wsutil.ReadClientData(conn)
 		if err != nil {
 			if len(wsCtx.PtyHandlerMap) != 0 { // 客户端主动断开连接
-				destroyAll(wsCtx)
+				endAll(wsCtx)
 			}
 			log.Info().Msgf("socket conn closed from %s", conn.RemoteAddr().String())
 			return
@@ -74,10 +72,10 @@ func (server *Server) handleTermWS(ctx *gin.Context) {
 func routeByEvent(wsCtx *WSContext, wsMsg Message) {
 	switch wsMsg.Event {
 	case "start":
-		startEventHandle(wsCtx, wsMsg.PtyID, wsCtx.config)
+		startEventHandle(wsCtx, wsMsg.PtyId, wsCtx.config)
 
 	case "end":
-		endEventHandle(wsCtx, wsMsg.PtyID)
+		endEventHandle(wsCtx, wsMsg.PtyId)
 
 	case "run-cmd":
 		/* 将Data字段解析为对应结构体 */
@@ -87,7 +85,7 @@ func routeByEvent(wsCtx *WSContext, wsMsg Message) {
 			return
 		}
 
-		runCmdEventHandle(wsCtx, wsMsg.PtyID, data.Cmd)
+		runCmdEventHandle(wsCtx, wsMsg.PtyId, data.Cmd)
 	}
 }
 
@@ -119,7 +117,7 @@ func (server *Server) handleCreateTerm(ctx *gin.Context) {
 	/* 创建pty */
 	// 容器名格式: <用户ID>-<终端模版ID>-<时间戳>
 	containerName := fmt.Sprintf("%d-%d-%d", tokenPayload.ID, template.ID, time.Now().Unix())
-	_, err = pty.NewPty(template.ImageName, containerName, server.config.PtyNetwork, nil)
+	ptyId, err := pty.NewPty(template.ImageName, containerName, server.config.PtyNetwork, nil)
 	if err != nil {
 		log.Error().Err(err).Msg("cannot create pty")
 		ctx.JSON(http.StatusInternalServerError, wrapResponse(false, "创建失败", nil))
@@ -128,13 +126,14 @@ func (server *Server) handleCreateTerm(ctx *gin.Context) {
 
 	/* 更新数据库 */
 	args := db.CreateTerminalParams{
+		ID:         ptyId,
 		Name:       containerName,
 		Size:       template.Size,
 		Remark:     req.Remark,
 		OwnerID:    tokenPayload.ID,
 		TemplateID: req.TemplateId,
 	}
-	res, err := server.store.CreateTerminal(ctx, args)
+	_, err = server.store.CreateTerminal(ctx, args)
 	if err != nil {
 		log.Error().Err(err).Msg("cannot create terminal")
 		ctx.JSON(http.StatusInternalServerError, wrapResponse(false, "创建失败", nil))
@@ -142,8 +141,7 @@ func (server *Server) handleCreateTerm(ctx *gin.Context) {
 	}
 
 	/* 查询新增终端实例 */
-	id, _ := res.LastInsertId()
-	term, err := server.store.GetTerminalById(ctx, id)
+	term, err := server.store.GetTerminalById(ctx, ptyId)
 	if err != nil {
 		log.Error().Err(err).Msg("cannot get terminal")
 		ctx.JSON(http.StatusInternalServerError, wrapResponse(false, "创建失败", nil))
@@ -159,37 +157,17 @@ func (server *Server) handleCreateTerm(ctx *gin.Context) {
 /* 销毁终端实例 */
 func (server *Server) handleDestroyTerm(ctx *gin.Context) {
 	/* 校验参数 */
-	terminalIdStr := ctx.Query("terminalId")
-	if terminalIdStr == "" {
+	terminalId := ctx.Query("terminalId")
+	if terminalId == "" {
 		log.Info().Msg("invalid params")
 		ctx.JSON(http.StatusBadRequest, wrapResponse(false, "参数不合法", nil))
 		return
 	}
-	terminalId, err := strconv.ParseInt(terminalIdStr, 10, 64)
-	if err != nil {
-		log.Error().Err(err).Msg("cannot parse terminalId")
-		ctx.JSON(http.StatusBadRequest, wrapResponse(false, "参数不合法", nil))
-		return
-	}
 
-	/* 查询终端实例 */
-	term, err := server.store.GetTerminalById(ctx, terminalId)
+	/* 销毁 */
+	err := pty.RemovePty(terminalId)
 	if err != nil {
-		log.Error().Err(err).Msg("cannot get terminal")
-		ctx.JSON(http.StatusInternalServerError, wrapResponse(false, "销毁失败", nil))
-		return
-	}
-
-	/* 获取Pty */
-	pty, err := pty.GetPty(term.Name)
-	if err != nil {
-		log.Error().Err(err).Msg("cannot get pty")
-		ctx.JSON(http.StatusInternalServerError, wrapResponse(false, "销毁失败", nil))
-		return
-	}
-
-	if err = pty.Remove(); err != nil {
-		log.Error().Err(err).Msg("cannot remove pty")
+		log.Error().Err(err).Msg("cannot destroy pty")
 		ctx.JSON(http.StatusInternalServerError, wrapResponse(false, "销毁失败", nil))
 		return
 	}
@@ -237,7 +215,7 @@ func (server *Server) handleGetUserTerms(ctx *gin.Context) {
 
 /* 修改终端实例信息 */
 type updateTermInfoReq struct {
-	TerminalId int64  `json:"terminalId" binding:"required"`
+	TerminalId string `json:"terminalId" binding:"required"`
 	Remark     string `json:"remark" binding:"omitempty"`
 }
 
