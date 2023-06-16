@@ -61,6 +61,7 @@ func (server *Server) setupRouter() {
 
 	authRouter := router.Group("/").Use(authMiddleware(server.tokenMaker))
 
+	authRouter.GET("/user/getInfo", server.handleGetUserInfo)
 	authRouter.PATCH("/user/updateInfo", server.handleUpdateUserInfo)
 
 	authRouter.GET("/terminal/ws", server.handleTermWS)

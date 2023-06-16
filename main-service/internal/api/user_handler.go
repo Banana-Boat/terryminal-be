@@ -161,6 +161,20 @@ func (server *Server) handleLogin(ctx *gin.Context) {
 	}))
 }
 
+/* 获取用户信息 */
+func (server *Server) handleGetUserInfo(ctx *gin.Context) {
+	tokenPayload := ctx.MustGet("token_payload").(*TokenPayload)
+	user, err := server.store.GetUserById(ctx, tokenPayload.ID)
+	if err != nil {
+		log.Error().Err(err).Msg("get user info failed")
+		ctx.JSON(http.StatusInternalServerError, wrapResponse(false, "获取用户信息失败", nil))
+		return
+	}
+
+	log.Info().Msg("get user info success")
+	ctx.JSON(http.StatusOK, wrapResponse(true, "", gin.H{"user": newUserOfResp(user)}))
+}
+
 /* 发送邮箱验证码 */
 func (server *Server) handleSendCodeByEmail(ctx *gin.Context) {
 	email := ctx.Query("email")
