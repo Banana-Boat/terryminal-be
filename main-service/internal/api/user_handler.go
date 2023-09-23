@@ -87,16 +87,7 @@ func (server *Server) handleRegister(ctx *gin.Context) {
 		Nickname: req.Nickname,
 		Password: hashedPassword,
 	}
-	res, err := server.store.CreateUser(ctx, arg)
-	if err != nil {
-		log.Error().Err(err).Msg("register failed")
-		ctx.JSON(http.StatusInternalServerError, wrapResponse(false, "注册失败", nil))
-		return
-	}
-
-	/* 查询新增用户 */
-	id, _ := res.LastInsertId()
-	user, err := server.store.GetUserById(ctx, id)
+	_, err = server.store.CreateUser(ctx, arg)
 	if err != nil {
 		log.Error().Err(err).Msg("register failed")
 		ctx.JSON(http.StatusInternalServerError, wrapResponse(false, "注册失败", nil))
@@ -105,7 +96,7 @@ func (server *Server) handleRegister(ctx *gin.Context) {
 
 	/* 返回结果 */
 	log.Info().Msg("register success")
-	ctx.JSON(http.StatusOK, wrapResponse(true, "", gin.H{"user": newUserOfResp(user)}))
+	ctx.JSON(http.StatusOK, wrapResponse(true, "", gin.H{"isOk": true}))
 }
 
 /* 登录 */
@@ -293,7 +284,7 @@ func (server *Server) handleUpdateUserPwd(ctx *gin.Context) {
 	}
 
 	log.Info().Msg("update success")
-	ctx.JSON(http.StatusOK, wrapResponse(true, "", nil))
+	ctx.JSON(http.StatusOK, wrapResponse(true, "", gin.H{"isOk": true}))
 }
 
 /* 修改用户信息 */

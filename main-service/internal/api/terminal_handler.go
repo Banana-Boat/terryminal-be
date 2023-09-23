@@ -180,7 +180,7 @@ func (server *Server) handleDestroyTerm(ctx *gin.Context) {
 	}
 
 	log.Info().Msg("destroy pty success")
-	ctx.JSON(http.StatusOK, wrapResponse(true, "", nil))
+	ctx.JSON(http.StatusOK, wrapResponse(true, "", gin.H{"isOk": true}))
 }
 
 /* 获取终端模版列表 */

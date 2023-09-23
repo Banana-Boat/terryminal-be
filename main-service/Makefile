@@ -34,6 +34,10 @@ else
 	docker run --name terryminal-mysql --network terryminal  -p 3306:3306 -e MYSQL_ROOT_PASSWORD=${DB_PASSWORD} -e MYSQL_DATABASE=${DB_NAME} -d mysql:8.0
 endif
 
+.PHONY: redis
+redis: ## 启动redis容器
+	docker run --name terryminal-redis --network terryminal -p 6379:6379 -d redis:7-alpine
+
 .PHONY: sqlc
 sqlc: ## 根据sql文件生成go代码
 	sqlc generate
@@ -53,13 +57,16 @@ run_docker: ## 启动服务（docker）
 	docker run -v /var/run/docker.sock:/var/run/docker.sock \
 	-e MIGRATION_FILE_URL=file://migration \
 	-e DB_HOST=terryminal-mysql \
+	-e REDIS_HOST=terryminal-redis \
 	-e CHATBOT_SERVICE_HOST=terryminal-chatbot \
 	--name terryminal-main --network terryminal -p 3200:3200 terryminal-main:dev
 
 .PHONY: clean_docker
-clean_docker: ## 停止容器并删除容器与镜像（main & mysql）
+clean_docker: ## 停止容器并删除容器与镜像（main & mysql & redis）
 	docker stop terryminal-mysql
 	docker rm terryminal-mysql
+	docker stop terryminal-redis
+	docker rm terryminal-redis
 	docker stop terryminal-main
 	docker rm terryminal-main
 	docker rmi terryminal-main:dev
