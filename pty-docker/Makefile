@@ -8,7 +8,7 @@ BASE_PTY_VERSION = 0.1.0
 
 .PHONY: evans
 evans: ## 测试gRPC服务
-		evans --proto ./base-pty/src/proto/base_pty.proto --host localhost --port 3220 repl
+	evans --proto ./base-pty/src/proto/base_pty.proto --host localhost --port 3220 repl
 
 .PHONY: build_images
 build_images: ## 构建镜像
