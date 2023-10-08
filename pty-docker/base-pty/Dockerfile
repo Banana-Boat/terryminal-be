@@ -1,12 +1,10 @@
-FROM node:18-alpine
+FROM python:3.9-slim
 WORKDIR /app
-RUN apk add --no-cache --update bash make python3 build-base
-# <src> 是一个目录，则将目录下的所有文件写入<dest>中
-COPY ./build ./build
-COPY package*.json .
-COPY .env .
-# make / python3 / build-base是node-pty所需的依赖项
-RUN npm install --omit=dev
+RUN apt install --no-install-recommends bash
+RUN pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/ && \
+    pip install --no-cache-dir python-dotenv grpcio protobuf
+RUN rm -rf /var/lib/apt/lists/*
+COPY . .
 
 EXPOSE 3220
-CMD [ "npm", "run", "start-prod" ]
+CMD [ "python", "run.py"]

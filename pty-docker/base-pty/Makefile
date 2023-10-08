@@ -5,10 +5,6 @@ help:
 
 # =================================================gRPC相关=======================================================
 .PHONY: proto
-# go-grpc_out对应protoc-gen-go-grpc插件；go_out对应protoc-gen-go插件
-proto: ## 根据proto文件生成go代码
-	rm -rf ./pb/*
-	python -m grpc_tools.protoc -I./proto --python_out=./pb --pyi_out=./pb --grpc_python_out=./pb ./proto/*.proto
-
-
-
+proto: ## 根据proto文件生成python代码
+	rm -rf ./*_pb2.py ./*_pb2_grpc.py ./*.pyi
+	python -m grpc_tools.protoc --proto_path=./proto --python_out=. --pyi_out=. --grpc_python_out=. ./proto/*.proto
