@@ -9,7 +9,7 @@ import (
 var terminalTemplateDict = []db.TerminalTemplate{
 	{
 		Name:        "Bash",
-		Size:        "529MB",
+		Size:        "173MB",
 		ImageName:   "tiangexiang/terryminal-base-pty:0.1.0",
 		Description: "基于Alpine Linux，仅可使用Bash",
 	},

@@ -14,8 +14,8 @@ create_network: ## 创建docker网络
 .PHONY: build_images
 build_images: ## 构建镜像
 	@echo "Building all the images..."
-	docker build -f ./main-service/Dockerfile -t ${DOCKER_USERNAME}/terryminal-main:${MAIN_VERSION} ./main-service
-	docker build -f ./chatbot-service/Dockerfile -t ${DOCKER_USERNAME}/terryminal-chatbot:${CHATBOT_VERSION} ./chatbot-service
+	docker build --no-cache -f ./main-service/Dockerfile -t ${DOCKER_USERNAME}/terryminal-main:${MAIN_VERSION} ./main-service
+# docker build --no-cache -f ./chatbot-service/Dockerfile -t ${DOCKER_USERNAME}/terryminal-chatbot:${CHATBOT_VERSION} ./chatbot-service
 
 .PHONY: remove_images
 remove_images: ## 删除镜像

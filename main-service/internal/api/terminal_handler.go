@@ -91,7 +91,7 @@ func routeByEvent(wsCtx *WSContext, wsMsg Message) {
 
 /* 创建终端实例 */
 type createTermReq struct {
-	TemplateId int64  `json:"templateId" binding:"required"`
+	TemplateID int64  `json:"templateID" binding:"required"`
 	Remark     string `json:"remark" binding:"omitempty"`
 }
 
@@ -107,7 +107,7 @@ func (server *Server) handleCreateTerm(ctx *gin.Context) {
 	}
 
 	/* 获得template */
-	template, err := server.store.GetTerminalTemplateById(ctx, req.TemplateId)
+	template, err := server.store.GetTerminalTemplateById(ctx, req.TemplateID)
 	if err != nil {
 		log.Error().Err(err).Msg("cannot get terminal template")
 		ctx.JSON(http.StatusInternalServerError, wrapResponse(false, "模版不存在", nil))
@@ -131,7 +131,7 @@ func (server *Server) handleCreateTerm(ctx *gin.Context) {
 		Size:       template.Size,
 		Remark:     req.Remark,
 		OwnerID:    tokenPayload.ID,
-		TemplateID: req.TemplateId,
+		TemplateID: req.TemplateID,
 	}
 	_, err = server.store.CreateTerminal(ctx, args)
 	if err != nil {
@@ -157,15 +157,15 @@ func (server *Server) handleCreateTerm(ctx *gin.Context) {
 /* 销毁终端实例 */
 func (server *Server) handleDestroyTerm(ctx *gin.Context) {
 	/* 校验参数 */
-	terminalId := ctx.Query("terminalId")
-	if terminalId == "" {
+	terminalID := ctx.Query("terminalID")
+	if terminalID == "" {
 		log.Info().Msg("invalid params")
 		ctx.JSON(http.StatusBadRequest, wrapResponse(false, "参数不合法", nil))
 		return
 	}
 
 	/* 销毁 */
-	err := pty.RemovePty(terminalId)
+	err := pty.RemovePty(terminalID)
 	if err != nil {
 		log.Error().Err(err).Msg("cannot destroy pty")
 		ctx.JSON(http.StatusInternalServerError, wrapResponse(false, "销毁失败", nil))
@@ -173,7 +173,7 @@ func (server *Server) handleDestroyTerm(ctx *gin.Context) {
 	}
 
 	/* 更新数据库 */
-	if err = server.store.DeleteTerminal(ctx, terminalId); err != nil {
+	if err = server.store.DeleteTerminal(ctx, terminalID); err != nil {
 		log.Error().Err(err).Msg("cannot delete terminal")
 		ctx.JSON(http.StatusInternalServerError, wrapResponse(false, "销毁失败", nil))
 		return
@@ -215,7 +215,7 @@ func (server *Server) handleGetUserTerms(ctx *gin.Context) {
 
 /* 修改终端实例信息 */
 type updateTermInfoReq struct {
-	TerminalId string `json:"terminalId" binding:"required"`
+	TerminalID string `json:"terminalID" binding:"required"`
 	Remark     string `json:"remark" binding:"omitempty"`
 }
 
@@ -229,7 +229,7 @@ func (server *Server) handleUpdateTermInfo(ctx *gin.Context) {
 	}
 
 	/* 获取终端实例 */
-	term, err := server.store.GetTerminalById(ctx, req.TerminalId)
+	term, err := server.store.GetTerminalById(ctx, req.TerminalID)
 	if err != nil {
 		log.Error().Err(err).Msg("cannot get terminal")
 		ctx.JSON(http.StatusInternalServerError, wrapResponse(false, "更新失败", nil))
@@ -238,7 +238,7 @@ func (server *Server) handleUpdateTermInfo(ctx *gin.Context) {
 
 	/* 更新数据库 */
 	args := db.UpdateTerminalInfoParams{
-		ID:            req.TerminalId,
+		ID:            req.TerminalID,
 		Size:          term.Size,
 		Remark:        req.Remark,
 		TotalDuration: term.TotalDuration,
@@ -251,7 +251,7 @@ func (server *Server) handleUpdateTermInfo(ctx *gin.Context) {
 	}
 
 	/* 查询新增终端实例 */
-	term, err = server.store.GetTerminalById(ctx, req.TerminalId)
+	term, err = server.store.GetTerminalById(ctx, req.TerminalID)
 	if err != nil {
 		log.Error().Err(err).Msg("cannot get terminal")
 		ctx.JSON(http.StatusInternalServerError, wrapResponse(false, "更新失败", nil))

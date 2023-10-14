@@ -58,6 +58,7 @@ func (server *Server) setupRouter() {
 	router.POST("/user/register", server.handleRegister)
 	router.GET("/user/sendCodeByEmail", server.handleSendCodeByEmail)
 	router.PATCH("/user/updatePassword", server.handleUpdateUserPwd)
+	router.GET("/terminal/getTemplates", server.handleGetTermTemplates)
 
 	authRouter := router.Group("/").Use(authMiddleware(server.tokenMaker))
 
@@ -67,7 +68,6 @@ func (server *Server) setupRouter() {
 	authRouter.GET("/terminal/ws", server.handleTermWS)
 	authRouter.POST("/terminal/create", server.handleCreateTerm)
 	authRouter.DELETE("/terminal/destroy", server.handleDestroyTerm)
-	authRouter.GET("/terminal/getTemplates", server.handleGetTermTemplates)
 	authRouter.GET("/terminal/getUserTerminlas", server.handleGetUserTerms)
 	authRouter.PATCH("/terminal/updateInfo", server.handleUpdateTermInfo)
 
