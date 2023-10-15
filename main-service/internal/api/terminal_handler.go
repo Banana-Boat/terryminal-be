@@ -124,7 +124,7 @@ func (server *Server) handleCreateTerm(ctx *gin.Context) {
 	template, err := server.store.GetTerminalTemplateById(ctx, req.TemplateID)
 	if err != nil {
 		log.Error().Err(err).Msg("cannot get terminal template")
-		ctx.JSON(http.StatusInternalServerError, wrapResponse(false, "模版不存在", nil))
+		ctx.JSON(http.StatusOK, wrapResponse(false, "模版不存在", nil))
 		return
 	}
 

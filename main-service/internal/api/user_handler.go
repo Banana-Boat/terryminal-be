@@ -70,7 +70,7 @@ func (server *Server) handleRegister(ctx *gin.Context) {
 	isExistUser, _ := server.store.IsUserExisted(ctx, req.Email)
 	if isExistUser {
 		log.Info().Msg("email already exists")
-		ctx.JSON(http.StatusConflict, wrapResponse(false, "邮箱已存在", nil))
+		ctx.JSON(http.StatusOK, wrapResponse(false, "邮箱已存在", nil))
 		return
 	}
 
@@ -117,7 +117,7 @@ func (server *Server) handleLogin(ctx *gin.Context) {
 	isExistUser, _ := server.store.IsUserExisted(ctx, req.Email)
 	if !isExistUser {
 		log.Info().Msg("user not found")
-		ctx.JSON(http.StatusBadRequest, wrapResponse(false, "用户不存在", nil))
+		ctx.JSON(http.StatusOK, wrapResponse(false, "用户不存在", nil))
 		return
 	}
 
@@ -133,7 +133,7 @@ func (server *Server) handleLogin(ctx *gin.Context) {
 	err = checkPassword(req.Password, user.Password)
 	if err != nil {
 		log.Info().Err(err).Msg("password incorrect")
-		ctx.JSON(http.StatusUnauthorized, wrapResponse(false, "密码错误", nil))
+		ctx.JSON(http.StatusOK, wrapResponse(false, "密码错误", nil))
 		return
 	}
 
@@ -179,7 +179,7 @@ func (server *Server) handleSendCodeByEmail(ctx *gin.Context) {
 	isExistUser, _ := server.store.IsUserExisted(ctx, email)
 	if !isExistUser {
 		log.Info().Msg("user not found")
-		ctx.JSON(http.StatusBadRequest, wrapResponse(false, "用户不存在", nil))
+		ctx.JSON(http.StatusOK, wrapResponse(false, "用户不存在", nil))
 		return
 	}
 
@@ -244,19 +244,19 @@ func (server *Server) handleUpdateUserPwd(ctx *gin.Context) {
 	user, err := server.store.GetUserByEmail(ctx, req.Email)
 	if err != nil {
 		log.Error().Err(err).Msg("user not found")
-		ctx.JSON(http.StatusBadRequest, wrapResponse(false, "用户不存在", nil))
+		ctx.JSON(http.StatusOK, wrapResponse(false, "用户不存在", nil))
 		return
 	}
 
 	/* 校验验证码 */
 	if user.VerificationCode.String != req.Code {
 		log.Info().Msg("code incorrect")
-		ctx.JSON(http.StatusBadRequest, wrapResponse(false, "验证码错误", nil))
+		ctx.JSON(http.StatusOK, wrapResponse(false, "验证码错误", nil))
 		return
 	}
 	if user.ExpiredAt.Time.Before(time.Now()) {
 		log.Info().Msg("code expired")
-		ctx.JSON(http.StatusBadRequest, wrapResponse(false, "验证码已过期", nil))
+		ctx.JSON(http.StatusOK, wrapResponse(false, "验证码已过期", nil))
 		return
 	}
 
