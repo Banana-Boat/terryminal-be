@@ -13,19 +13,19 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-func startEventHandle(wsCtx *WSContext, ptyId string, config util.Config) {
+func startEventHandle(wsCtx *WSContext, ptyID string, config util.Config) {
 	/* 启动容器 */
-	if err = pty.StartPty(ptyId); err != nil {
+	if err = pty.StartPty(ptyID); err != nil {
 		log.Error().Err(err).Msg("failed to start pty container")
-		sendMessage(wsCtx.conn, ptyId, "start", StartServerData{Result: false})
+		sendMessage(wsCtx.conn, ptyID, "start", StartServerData{Result: false})
 		return
 	}
 
 	/* 创建gRPC Client */
-	ptyName, err := pty.GetPtyName(ptyId) // 获取容器名
+	ptyName, err := pty.GetPtyName(ptyID) // 获取容器名
 	if err != nil {
 		log.Error().Err(err).Msg("failed to get pty name")
-		sendMessage(wsCtx.conn, ptyId, "start", StartServerData{Result: false})
+		sendMessage(wsCtx.conn, ptyID, "start", StartServerData{Result: false})
 		return
 	}
 	gRPCConnection, err := grpc.Dial(
@@ -35,7 +35,7 @@ func startEventHandle(wsCtx *WSContext, ptyId string, config util.Config) {
 	)
 	if err != nil {
 		log.Error().Err(err).Msg("failed to create gRPC client")
-		sendMessage(wsCtx.conn, ptyId, "start", StartServerData{Result: false})
+		sendMessage(wsCtx.conn, ptyID, "start", StartServerData{Result: false})
 		return
 	}
 	client := pb.NewBasePtyClient(gRPCConnection)
@@ -44,7 +44,7 @@ func startEventHandle(wsCtx *WSContext, ptyId string, config util.Config) {
 	ptyStream, err := client.RunCmd(context.Background())
 	if err != nil {
 		log.Error().Err(err).Msg("failed to create gRPC client")
-		sendMessage(wsCtx.conn, ptyId, "start", StartServerData{Result: false})
+		sendMessage(wsCtx.conn, ptyID, "start", StartServerData{Result: false})
 		return
 	}
 	go func() {
@@ -58,7 +58,7 @@ func startEventHandle(wsCtx *WSContext, ptyId string, config util.Config) {
 				return
 			}
 
-			sendMessage(wsCtx.conn, ptyId, "run-cmd", RunCmdServerData{IsError: false, Result: resp.Result})
+			sendMessage(wsCtx.conn, ptyID, "run-cmd", RunCmdServerData{IsError: false, Result: resp.Result})
 		}
 	}()
 
@@ -68,61 +68,61 @@ func startEventHandle(wsCtx *WSContext, ptyId string, config util.Config) {
 		gRPCClient: client,
 		gRPCStream: ptyStream,
 	}
-	wsCtx.PtyHandlerMap[ptyId] = ptyHandler
+	wsCtx.PtyHandlerMap[ptyID] = ptyHandler
 
 	/* 向客户端发送成功的消息 */
-	log.Info().Msgf("PtyId: %s, start pty container and create gRPC client successfully", ptyId)
-	sendMessage(wsCtx.conn, ptyId, "start", StartServerData{Result: true})
+	log.Info().Msgf("PtyID: %s, start pty container and create gRPC client successfully", ptyID)
+	sendMessage(wsCtx.conn, ptyID, "start", StartServerData{Result: true})
 }
 
-func runCmdEventHandle(wsCtx *WSContext, ptyId string, cmd string) {
+func runCmdEventHandle(wsCtx *WSContext, ptyID string, cmd string) {
 	if cmd == "exit" { // 后续需要补充退出的命令 Ctr+D / Ctrl+C
 		log.Warn().Msgf("receive invalid command: %s", cmd)
-		sendMessage(wsCtx.conn, ptyId, "run-cmd", RunCmdServerData{IsError: true, Result: "命令不合法"})
+		sendMessage(wsCtx.conn, ptyID, "run-cmd", RunCmdServerData{IsError: true, Result: "命令不合法"})
 		return
 	}
 
 	log.Info().Msgf("run-cmd send: %s", cmd)
-	wsCtx.PtyHandlerMap[ptyId].gRPCStream.Send(&pb.RunCmdRequest{
+	wsCtx.PtyHandlerMap[ptyID].gRPCStream.Send(&pb.RunCmdRequest{
 		Cmd: cmd,
 	})
 }
 
-func endEventHandle(wsCtx *WSContext, ptyId string) {
-	if err := end(wsCtx, ptyId); err != nil {
-		log.Error().Err(err).Msgf("PtyID: %s, failed to stop pty and close gRPC client", ptyId)
-		sendMessage(wsCtx.conn, ptyId, "end", EndServerData{Result: false})
+func endEventHandle(wsCtx *WSContext, ptyID string) {
+	if err := end(wsCtx, ptyID); err != nil {
+		log.Error().Err(err).Msgf("PtyID: %s, failed to stop pty and close gRPC client", ptyID)
+		sendMessage(wsCtx.conn, ptyID, "end", EndServerData{Result: false})
 		return
 	}
 
-	sendMessage(wsCtx.conn, ptyId, "end", EndServerData{Result: true})
+	sendMessage(wsCtx.conn, ptyID, "end", EndServerData{Result: true})
 }
 
-func end(wsCtx *WSContext, ptyId string) error {
-	if wsCtx.PtyHandlerMap[ptyId] == nil {
-		return fmt.Errorf("ptyId: %s not found", ptyId)
+func end(wsCtx *WSContext, ptyID string) error {
+	if wsCtx.PtyHandlerMap[ptyID] == nil {
+		return fmt.Errorf("ptyID: %s not found", ptyID)
 	}
 
-	ptyHandler := wsCtx.PtyHandlerMap[ptyId]
+	ptyHandler := wsCtx.PtyHandlerMap[ptyID]
 	if err := ptyHandler.gRPCConn.Close(); err != nil {
 		return err
 	}
-	if err := pty.StopPty(ptyId); err != nil {
+	if err := pty.StopPty(ptyID); err != nil {
 		return err
 	}
 
-	delete(wsCtx.PtyHandlerMap, ptyId)
+	delete(wsCtx.PtyHandlerMap, ptyID)
+
+	log.Info().Msgf("PtyID: %s, stop pty and close gRPC client successfully", ptyID)
 	return nil
 }
 
 /* 遍历所有的ptyHandler，关闭gRPC连接，停止容器 */
 func endAll(wsCtx *WSContext) {
-	for ptyId := range wsCtx.PtyHandlerMap {
-		if err := end(wsCtx, ptyId); err != nil {
-			log.Error().Err(err).Msgf("PtyId: %s, failed to stop pty and close gRPC client", ptyId)
+	for ptyID := range wsCtx.PtyHandlerMap {
+		if err := end(wsCtx, ptyID); err != nil {
+			log.Error().Err(err).Msgf("PtyID: %s, failed to stop pty and close gRPC client", ptyID)
 			continue
 		}
-
-		log.Info().Msgf("PtyId: %s, stop pty and close gRPC client successfully", ptyId)
 	}
 }

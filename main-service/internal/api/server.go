@@ -58,14 +58,15 @@ func (server *Server) setupRouter() {
 	router.POST("/user/register", server.handleRegister)
 	router.GET("/user/sendCodeByEmail", server.handleSendCodeByEmail)
 	router.PATCH("/user/updatePassword", server.handleUpdateUserPwd)
+
 	router.GET("/terminal/getTemplates", server.handleGetTermTemplates)
+	router.GET("/terminal/ws", server.handleTermWS) // 由于前端WebSocket无法直接添加请求头，故该请求单独做鉴权
 
 	authRouter := router.Group("/").Use(authMiddleware(server.tokenMaker))
 
 	authRouter.GET("/user/getInfo", server.handleGetUserInfo)
 	authRouter.PATCH("/user/updateInfo", server.handleUpdateUserInfo)
 
-	authRouter.GET("/terminal/ws", server.handleTermWS)
 	authRouter.POST("/terminal/create", server.handleCreateTerm)
 	authRouter.DELETE("/terminal/destroy", server.handleDestroyTerm)
 	authRouter.GET("/terminal/getUserTerminlas", server.handleGetUserTerms)

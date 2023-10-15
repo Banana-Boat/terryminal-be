@@ -28,7 +28,7 @@ func TestCreateBash(t *testing.T) {
 
 	/* 容器创建并启动 */
 	containerName := fmt.Sprint(time.Now().Unix())
-	ptyId, err := NewPty(
+	ptyID, err := NewPty(
 		config.BasePtyImageName, containerName, "",
 		&PtyPortMap{
 			HostPort:      config.BasePtyPort,
@@ -38,7 +38,7 @@ func TestCreateBash(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if err = StartPty(ptyId); err != nil {
+	if err = StartPty(ptyID); err != nil {
 		t.Error(err)
 	}
 
@@ -80,10 +80,10 @@ func TestCreateBash(t *testing.T) {
 	<-done
 
 	/* 关闭并删除容器 */
-	if err = StopPty(ptyId); err != nil {
+	if err = StopPty(ptyID); err != nil {
 		t.Error(err)
 	}
-	if err = RemovePty(ptyId); err != nil {
+	if err = RemovePty(ptyID); err != nil {
 		t.Error(err)
 	}
 }

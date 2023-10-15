@@ -12,7 +12,7 @@ import (
 
 // websocket message定义
 type Message struct {
-	PtyId string                 `json:"ptyId" mapstructure:"ptyId"`
+	PtyID string                 `json:"ptyID" mapstructure:"ptyID"`
 	Event string                 `json:"event" mapstructure:"event"`
 	Data  map[string]interface{} `json:"data" mapstructure:"data"`
 }
@@ -34,12 +34,12 @@ type RunCmdServerData struct {
 	Result  string `json:"result" mapstructure:"result"`
 }
 
-func sendMessage(conn net.Conn, ptyId string, event string, data interface{}) {
+func sendMessage(conn net.Conn, ptyID string, event string, data interface{}) {
 	var _data map[string]interface{}
 	mapstructure.Decode(data, &_data)
 
 	msg, _ := json.Marshal(Message{
-		PtyId: ptyId,
+		PtyID: ptyID,
 		Event: event,
 		Data:  _data,
 	})

@@ -34,6 +34,20 @@ type WSContext struct {
 
 /* Websocket连接 */
 func (server *Server) handleTermWS(ctx *gin.Context) {
+	/* 单独做鉴权，校验token */
+	token := ctx.Query("token")
+	if token == "" {
+		log.Info().Msg("invalid params")
+		ctx.JSON(http.StatusBadRequest, wrapResponse(false, "参数不合法", nil))
+		return
+	}
+	_, err := server.tokenMaker.VerifyToken(token)
+	if err != nil {
+		log.Error().Err(err).Msg("failed to verify token")
+		ctx.AbortWithStatusJSON(http.StatusUnauthorized, wrapResponse(false, err.Error(), nil))
+		return
+	}
+
 	conn, _, _, err := ws.UpgradeHTTP(ctx.Request, ctx.Writer)
 	if err != nil {
 		log.Error().Err(err).Msg("cannot upgrade http to websocket")
@@ -72,10 +86,10 @@ func (server *Server) handleTermWS(ctx *gin.Context) {
 func routeByEvent(wsCtx *WSContext, wsMsg Message) {
 	switch wsMsg.Event {
 	case "start":
-		startEventHandle(wsCtx, wsMsg.PtyId, wsCtx.config)
+		startEventHandle(wsCtx, wsMsg.PtyID, wsCtx.config)
 
 	case "end":
-		endEventHandle(wsCtx, wsMsg.PtyId)
+		endEventHandle(wsCtx, wsMsg.PtyID)
 
 	case "run-cmd":
 		/* 将Data字段解析为对应结构体 */
@@ -85,7 +99,7 @@ func routeByEvent(wsCtx *WSContext, wsMsg Message) {
 			return
 		}
 
-		runCmdEventHandle(wsCtx, wsMsg.PtyId, data.Cmd)
+		runCmdEventHandle(wsCtx, wsMsg.PtyID, data.Cmd)
 	}
 }
 
@@ -117,7 +131,7 @@ func (server *Server) handleCreateTerm(ctx *gin.Context) {
 	/* 创建pty */
 	// 容器名格式: <用户ID>-<终端模版ID>-<时间戳>
 	containerName := fmt.Sprintf("%d-%d-%d", tokenPayload.ID, template.ID, time.Now().Unix())
-	ptyId, err := pty.NewPty(template.ImageName, containerName, server.config.PtyNetwork, nil)
+	ptyID, err := pty.NewPty(template.ImageName, containerName, server.config.PtyNetwork, nil)
 	if err != nil {
 		log.Error().Err(err).Msg("cannot create pty")
 		ctx.JSON(http.StatusInternalServerError, wrapResponse(false, "创建失败", nil))
@@ -126,7 +140,7 @@ func (server *Server) handleCreateTerm(ctx *gin.Context) {
 
 	/* 更新数据库 */
 	args := db.CreateTerminalParams{
-		ID:         ptyId,
+		ID:         ptyID,
 		Name:       containerName,
 		Size:       template.Size,
 		Remark:     req.Remark,
@@ -141,7 +155,7 @@ func (server *Server) handleCreateTerm(ctx *gin.Context) {
 	}
 
 	/* 查询新增终端实例 */
-	term, err := server.store.GetTerminalById(ctx, ptyId)
+	term, err := server.store.GetTerminalById(ctx, ptyID)
 	if err != nil {
 		log.Error().Err(err).Msg("cannot get terminal")
 		ctx.JSON(http.StatusInternalServerError, wrapResponse(false, "创建失败", nil))
