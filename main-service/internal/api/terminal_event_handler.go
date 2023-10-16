@@ -15,7 +15,7 @@ import (
 
 func startEventHandle(wsCtx *WSContext, ptyID string, config util.Config) {
 	/* 启动容器 */
-	if err = pty.StartPty(ptyID); err != nil {
+	if err := pty.StartPty(ptyID); err != nil {
 		log.Error().Err(err).Msg("failed to start pty container")
 		sendMessage(wsCtx.conn, ptyID, "start", StartServerData{Result: false})
 		return

@@ -198,7 +198,7 @@ func (server *Server) handleSendCodeByEmail(ctx *gin.Context) {
 		ExpiredAt:        sql.NullTime{Time: time.Now().Add(time.Minute * 5), Valid: true},
 		UpdatedAt:        time.Now(),
 	}
-	err = server.store.UpdateVerificationCode(ctx, arg)
+	err := server.store.UpdateVerificationCode(ctx, arg)
 	if err != nil {
 		log.Error().Err(err).Msg("verification code generate failed")
 		ctx.JSON(http.StatusInternalServerError, wrapResponse(false, "验证码生成失败", nil))
