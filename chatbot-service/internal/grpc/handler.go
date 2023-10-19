@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"io"
+	"strconv"
 
 	"github.com/rs/zerolog/log"
 	"github.com/sashabaranov/go-openai"
@@ -48,6 +49,7 @@ func (server *Server) Chat(req *pb.ChatRequest, stream pb.Chatbot_ChatServer) er
 					log.Error().Err(err).Msg("CalTokenCost failed")
 				} else {
 					log.Info().Msgf("Token cost: %d", tokens)
+					stream.Send(&pb.ChatResponse{Event: "token", Data: strconv.Itoa(tokens)})
 				}
 
 				// 向客户端发送结束信息，退出循环
