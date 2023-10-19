@@ -27,6 +27,7 @@ type PtyHandler struct {
 
 // socket连接上下文
 type WSContext struct {
+	store         *db.Store
 	conn          net.Conn
 	config        util.Config
 	PtyHandlerMap map[string]*PtyHandler
@@ -57,6 +58,7 @@ func (server *Server) handleTermWS(ctx *gin.Context) {
 	defer conn.Close()
 
 	wsCtx := &WSContext{
+		store:         server.store,
 		conn:          conn,
 		config:        server.config,
 		PtyHandlerMap: make(map[string]*PtyHandler),
@@ -117,6 +119,14 @@ func (server *Server) handleCreateTerm(ctx *gin.Context) {
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		log.Info().Err(err).Msg("invalid request body")
 		ctx.JSON(http.StatusBadRequest, wrapResponse(false, "参数不合法", nil))
+		return
+	}
+
+	/* 判断用户容器数量是否超过上限 */
+	terms, _ := server.store.GetTerminalByOwnId(ctx, tokenPayload.ID)
+	if len(terms) >= 3 {
+		log.Info().Msg("user's terminals reach the upper limit")
+		ctx.JSON(http.StatusOK, wrapResponse(false, "容器数量已达上限", nil))
 		return
 	}
 

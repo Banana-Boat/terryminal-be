@@ -4,7 +4,9 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"time"
 
+	"github.com/Banana-Boat/terryminal/main-service/internal/db"
 	"github.com/Banana-Boat/terryminal/main-service/internal/pb"
 	"github.com/Banana-Boat/terryminal/main-service/internal/pty"
 	"github.com/Banana-Boat/terryminal/main-service/internal/util"
@@ -22,7 +24,8 @@ func startEventHandle(wsCtx *WSContext, ptyID string, config util.Config) {
 	}
 
 	/* 创建gRPC Client */
-	ptyName, err := pty.GetPtyName(ptyID) // 获取容器名
+	ptyInfo, err := pty.GetPtyInfo(ptyID)
+	ptyName := ptyInfo.Name[1:] // 获取容器名
 	if err != nil {
 		log.Error().Err(err).Msg("failed to get pty name")
 		sendMessage(wsCtx.conn, ptyID, "start", StartServerData{Result: false})
@@ -96,6 +99,38 @@ func endEventHandle(wsCtx *WSContext, ptyID string) {
 	}
 
 	sendMessage(wsCtx.conn, ptyID, "end", EndServerData{Result: true})
+
+	/* 更新容器使用时间 */
+	ptyInfo, err := pty.GetPtyInfo(ptyID)
+	if err != nil {
+		log.Error().Err(err).Msgf("PtyID: %s, failed to calculate duration", ptyID)
+		return
+	}
+	timeStart, _ := time.Parse(time.RFC3339Nano, ptyInfo.State.StartedAt)
+	timeEnd, _ := time.Parse(time.RFC3339Nano, ptyInfo.State.FinishedAt)
+	duration := int32(timeEnd.Sub(timeStart).Seconds())
+
+	ctx := context.Background()
+	term, err := wsCtx.store.GetTerminalById(ctx, ptyID)
+	if err != nil {
+		log.Error().Err(err).Msg("cannot get terminal")
+		return
+	}
+
+	/* 更新数据库 */
+	args := db.UpdateTerminalInfoParams{
+		ID:            term.ID,
+		Size:          term.Size,
+		Remark:        term.Remark,
+		TotalDuration: duration,
+		UpdatedAt:     time.Now(),
+	}
+	if err := wsCtx.store.UpdateTerminalInfo(ctx, args); err != nil {
+		log.Error().Err(err).Msg("cannot update terminal")
+		return
+	}
+
+	log.Info().Msgf("PtyID: %s, calculate terminal's duration successfully", ptyID)
 }
 
 func end(wsCtx *WSContext, ptyID string) error {

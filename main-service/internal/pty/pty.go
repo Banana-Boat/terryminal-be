@@ -81,23 +81,23 @@ func NewPty(imageName string, containerName string, network string, ptyPortMap *
 	return resp.ID, nil
 }
 
-/* 根据容器Id获取容器名 */
-func GetPtyName(id string) (string, error) {
+/* 根据容器Id获取容信息 */
+func GetPtyInfo(id string) (types.ContainerJSON, error) {
 	/* 创建docker client */
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
-		return "", err
+		return types.ContainerJSON{}, err
 	}
 	defer cli.Close()
 
 	/* 获取容器信息 */
 	container, err := cli.ContainerInspect(context.Background(), id)
 	if err != nil {
-		return "", err
+		return types.ContainerJSON{}, err
 	}
 
 	// 容器名第一个字符为/，需要去掉
-	return container.Name[1:], nil
+	return container, nil
 }
 
 /* 启动容器 */
