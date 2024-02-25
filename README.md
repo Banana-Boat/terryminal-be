@@ -1,10 +1,25 @@
-# Terryminal
+# <center>Terryminal</center>
 
-The backend of Terry's online Terminal
+一款在线终端命令学习平台！
+
+- 告别终端环境配置，浏览器环境开箱即用
+- AI机器人为你解答一切关于Linux命令的疑问
 
 ## 界面演示
 
-_待补全..._
+#### 1. 登录 / 注册
+
+<div class="flexible">
+<img src="./readme-image/index.png" width="45%">
+<img src="./readme-image/register.png" width="45%">
+</div>
+
+#### 2. 控制台 / 终端窗口 / AI机器人
+
+<div class="flexible">
+<img src="./readme-image/dashboard.png" width="45%">
+<img src="./readme-image/learn.png" width="45%">
+</div>
 
 ## 架构图
 
