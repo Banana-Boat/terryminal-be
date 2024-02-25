@@ -10,15 +10,15 @@
 #### 1. 登录 / 注册
 
 <div class="flexible">
-<img src="./readme-image/index.png" width="45%">
-<img src="./readme-image/register.png" width="45%">
+<img src="./readme-image/index.png" width="49%">
+<img src="./readme-image/register.png" width="49%">
 </div>
 
 #### 2. 控制台 / 终端窗口 / AI机器人
 
 <div class="flexible">
-<img src="./readme-image/dashboard.png" width="45%">
-<img src="./readme-image/learn.png" width="45%">
+<img src="./readme-image/dashboard.png" width="49%">
+<img src="./readme-image/learn.png" width="49%">
 </div>
 
 ## 架构图
