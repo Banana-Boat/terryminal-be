@@ -91,11 +91,14 @@ erDiagram
 
 ## 主要依赖
 
+- [**Gin**](https://github.com/gin-gonic/gin)
 - [**gRPC**](https://grpc.io/)
+- [**WS**](https://github.com/gobwas/ws)（WebSocket库）
+- [**Moby**](https://github.com/moby/moby)（Docker Engine API库）
 - [**sqlc**](https://docs.sqlc.dev/en/stable/index.html)（sql->go 接口）
-- [**Protocol Buffers**](https://protobuf.dev)（gRPC 数据定义）
 - [**Asynq**](https://github.com/hibiken/asynq)（任务队列异步处理框架）
 - [**golang-migrate**](https://github.com/golang-migrate/migrate)（数据库迁移）
+- [**Go OpenAI**](https://github.com/sashabaranov/go-openai)（OpenAI API调用库）
 - [**Paseto**](https://github.com/o1egl/paseto)（用户鉴权）
 
 ## 端口划分
